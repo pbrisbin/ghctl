@@ -1,0 +1,61 @@
+# Basic settings
+description: Parse a string into words, like a shell would
+homepage: null
+private: false
+visibility: public
+has_issues: true
+has_projects: false
+has_wiki: false
+default_branch: main
+allow_squash_merge: false
+allow_merge_commit: false
+allow_rebase_merge: true
+allow_auto_merge: true
+delete_branch_on_merge: true
+allow_update_branch: true
+
+# Collaborators
+collaborators:
+  - team_slug: {team}
+    permission: push
+  - username: {username}
+    permission: push
+
+# Rules
+rulesets:
+  main:
+    target: main
+    enforcement: active
+
+    bypass_actors:
+      - actor_type: OrganizationAdmin
+        bypass_mode: always
+      - actor_type: RepositoryAdmin
+        bypass_mode: pull_requests
+      - actor_type: Integration
+        actor_id: pbrisbin-automation # ??
+        bypass_mode: always
+
+    conditions:
+      ref_name:
+        include:
+          - refs/heads/main
+    rules:
+      - type: deletion
+      - type: pull_request
+        parameters:
+          allowed_merge_methods:
+            - rebase
+          required_approving_review_count: 0
+          required_review_thread_resolution: true
+      - type: required_status_checks
+        parameters:
+          required_status_checks:
+            - context: "test (stack.yaml)"
+              integration_id: actions
+            - context: restyled
+              integration_id: actions
+            - context: commitlint
+              integration_id: actions
+          strict_required_status_checks_policy: false
+      - type: non_fast_forward
