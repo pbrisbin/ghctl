@@ -1,0 +1,79 @@
+cabal-version: 1.18
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           ghctl
+version:        0.0.0.0
+synopsis:       CLI for maintaining GitHub settings as [IaC][].
+description:    Please see README.md
+category:       CLI
+homepage:       https://github.com/pbrisbin/ghctl#readme
+bug-reports:    https://github.com/pbrisbin/ghctl/issues
+maintainer:     Pat Brisbin
+license:        AGPL-3
+build-type:     Simple
+extra-doc-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/pbrisbin/ghctl
+
+library
+  exposed-modules:
+      GHCTL.Main
+      GHCTL.Prelude
+  other-modules:
+      Paths_ghctl
+  hs-source-dirs:
+      src
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      GADTs
+      LambdaCase
+      NoFieldSelectors
+      NoImplicitPrelude
+      NoMonomorphismRestriction
+      OverloadedRecordDot
+      OverloadedStrings
+      RecordWildCards
+      TypeFamilies
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path
+  build-depends:
+      base <5
+    , relude
+  default-language: GHC2021
+
+executable ghctl
+  main-is: Main.hs
+  other-modules:
+      Paths_ghctl
+  hs-source-dirs:
+      app
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      GADTs
+      LambdaCase
+      NoFieldSelectors
+      NoImplicitPrelude
+      NoMonomorphismRestriction
+      OverloadedRecordDot
+      OverloadedStrings
+      RecordWildCards
+      TypeFamilies
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
+  build-depends:
+      base <5
+    , ghctl
+  default-language: GHC2021
