@@ -24,8 +24,27 @@ source-repository head
 
 library
   exposed-modules:
+      GHCTL.App
+      GHCTL.BranchProtection
+      GHCTL.Change
+      GHCTL.Change.Apply
+      GHCTL.Change.Pretty
+      GHCTL.Diff
+      GHCTL.GitHub
+      GHCTL.GitHub.Actual
+      GHCTL.GitHub.Client
+      GHCTL.GitHub.Client.Error
+      GHCTL.GitHub.Token
+      GHCTL.Identified
       GHCTL.Main
+      GHCTL.Options
       GHCTL.Prelude
+      GHCTL.RepositoriesYaml
+      GHCTL.Repository
+      GHCTL.RepositoryFullName
+      GHCTL.Ruleset
+      GHCTL.RulesetEnforcement
+      GHCTL.TextBoundedEnum
   other-modules:
       Paths_ghctl
   hs-source-dirs:
@@ -45,10 +64,27 @@ library
       OverloadedStrings
       RecordWildCards
       TypeFamilies
-  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
-      base <5
+      Blammo
+    , Diff
+    , aeson
+    , aeson-pretty
+    , base <5
+    , bytestring
+    , conduit
+    , extra
+    , http-conduit
+    , http-types
+    , lens
+    , optparse-applicative
+    , path
     , relude
+    , semigroupoids
+    , text
+    , these
+    , unliftio
+    , yaml
   default-language: GHC2021
 
 executable ghctl
@@ -72,7 +108,7 @@ executable ghctl
       OverloadedStrings
       RecordWildCards
       TypeFamilies
-  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
       base <5
     , ghctl

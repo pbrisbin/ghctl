@@ -22,6 +22,7 @@ ghc-options:
   - -Wno-missing-import-lists
   - -Wno-missing-kind-signatures
   - -Wno-missing-local-signatures
+  - -Wno-missing-role-annotations
   - -Wno-missing-safe-haskell-mode
   - -Wno-monomorphism-restriction
   - -Wno-prepositive-qualified-module
@@ -51,7 +52,24 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
+    - Blammo
+    - Diff
+    - aeson
+    - aeson-pretty
+    - bytestring
+    - conduit
+    - extra
+    - http-conduit
+    - http-types
+    - lens
+    - optparse-applicative
+    - path
     - relude
+    - semigroupoids
+    - text
+    - these
+    - unliftio
+    - yaml
 
 executables:
   ghctl:
