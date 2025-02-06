@@ -20,6 +20,35 @@ jobs:
       #   with:
       #     ghc-version: ${{ steps.stack.outputs.compiler-version }}
 
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ${{ steps.stack.outputs.local-install-root }}/bin/ghctl
+          if-no-files-found: error
+
+  test-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+
+      - name: Install ghctl
+        run: |
+          chmod +x ghctl
+          sudo mv -v ghctl /usr/local/bin
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            repositories.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Assert no differences in ghctl-plan
+        run: ghctl plan --fail-on-diff
+        env:
+          LOG_BREAKPOINT: 200
+          LOG_COLOR: always
+
   lint:
     runs-on: ubuntu-latest
     steps:
