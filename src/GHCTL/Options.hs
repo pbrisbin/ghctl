@@ -32,7 +32,7 @@ data Options = Options
   }
 
 data Command
-  = Plan
+  = Plan Bool Int
   | Apply
   | Import (NonEmpty RepositoryFullName)
 
@@ -91,13 +91,32 @@ optionsParser =
       ( mconcat
           [ command "plan"
               . withInfo "show differences in desired and current state"
-              $ pure Plan
+              $ planParser
           , command "apply"
               . withInfo "apply differences to current state"
               $ pure Apply
           , command "import"
               . withInfo "import repository definitions"
               $ importParser
+          ]
+      )
+
+planParser :: Parser Command
+planParser =
+  Plan
+    <$> switch
+      ( mconcat
+          [ long "fail-on-diff"
+          , help "Fail if there are differences"
+          ]
+      )
+    <*> option
+      auto
+      ( mconcat
+          [ long "fail-on-diff-exit-code"
+          , help "Exit code to use when failing due to diff"
+          , value 228
+          , showDefault
           ]
       )
 

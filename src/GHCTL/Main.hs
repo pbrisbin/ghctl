@@ -21,13 +21,16 @@ import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
+import System.Exit (ExitCode (..))
 
 main :: IO ()
 main = do
   options <- parseOptions
 
   runAppM $ case options.command of
-    Plan -> forChanges_ options.path prettyPrintChange
+    Plan failOnDiff failOnDiffExitCode -> do
+      diff <- forChanges options.path prettyPrintChange
+      when (diff && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
     Apply -> forChanges_ options.path $ \c -> do
       prettyPrintChange c
       applyChange c `catch` \err -> do
@@ -42,9 +45,22 @@ forChanges_
   => PathArg
   -> (Change -> m ())
   -> m ()
-forChanges_ pathArg f = do
+forChanges_ pathArg f = void $ forChanges pathArg f
+
+-- | Run an action on each 'Change'
+--
+-- Returns 'False' if there were no changes, 'True' otherwise.
+forChanges
+  :: (MonadGitHub m, MonadIO m, MonadLogger m)
+  => PathArg
+  -> (Change -> m a)
+  -> m Bool
+forChanges pathArg f = do
   mChanges <- nonEmpty <$> buildChanges pathArg
-  maybe (logInfo "All repositories up to date") (traverse_ f) mChanges
+  maybe
+    (False <$ logInfo "All repositories up to date")
+    ((True <$) . traverse_ f)
+    mChanges
 
 buildChanges :: (MonadGitHub m, MonadIO m) => PathArg -> m [Change]
 buildChanges pathArg = do
