@@ -31,11 +31,15 @@ Available commands:
 
 ```console
 % ghctl plan --help
-Usage: ghctl plan 
+Usage: ghctl plan [--fail-on-diff] [--fail-on-diff-exit-code ARG]
 
   show differences in desired and current state
 
 Available options:
+  --fail-on-diff           Fail if there are differences
+  --fail-on-diff-exit-code ARG
+                           Exit code to use when failing due to diff
+                           (default: 228)
   -h,--help                Show this help text
 ```
 
