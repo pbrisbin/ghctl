@@ -4,7 +4,7 @@ license: AGPL-3
 maintainer: Pat Brisbin
 category: CLI
 github: pbrisbin/ghctl
-synopsis: CLI for maintaining GitHub settings as [IaC][].
+synopsis: CLI for maintaining GitHub settings as IaC
 description: Please see README.md
 
 extra-doc-files:
