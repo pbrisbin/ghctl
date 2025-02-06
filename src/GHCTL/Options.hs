@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 -- |
 --
 -- Module      : GHCTL.Options
@@ -6,8 +8,6 @@
 -- Maintainer  : pbrisbin@gmail.com
 -- Stability   : experimental
 -- Portability : POSIX
-{-# LANGUAGE QuasiQuotes #-}
-
 module GHCTL.Options
   ( Options (..)
   , Command (..)
