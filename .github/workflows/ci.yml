@@ -23,9 +23,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           path: ${{ steps.stack.outputs.local-install-root }}/bin/ghctl
+          name: binaries
           if-no-files-found: error
 
   test-plan:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
