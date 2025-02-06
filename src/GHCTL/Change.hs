@@ -16,8 +16,8 @@ import GHCTL.Prelude
 import Conduit
 import Data.These.Combinators (bimapThese)
 import GHCTL.BranchProtection
-import GHCTL.Repository
 import GHCTL.RepositoriesYaml
+import GHCTL.Repository
 import GHCTL.Ruleset
 
 data Change
