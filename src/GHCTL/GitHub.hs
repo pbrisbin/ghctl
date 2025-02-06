@@ -27,3 +27,5 @@ class Monad m => MonadGitHub m where
   updateRepository :: Text -> Text -> Repository -> m ()
 
   updateRepositoryRuleset :: Text -> Text -> Int -> Ruleset -> m ()
+
+  createRepositoryRuleset :: Text -> Text -> Ruleset -> m ()

@@ -23,7 +23,11 @@ applyChange = \case
   CreateBranchProtection {} -> logWarn "unimplemented"
   DeleteBranchProtection {} -> logWarn "unimplemented"
   UpdateBranchProtection {} -> logWarn "unimplemented"
-  CreateRuleset {} -> logWarn "unimplemented"
+  CreateRuleset repository ruleset ->
+    GitHub.createRepositoryRuleset
+      repository.full_name.owner
+      repository.full_name.name
+      ruleset
   DeleteRuleset {} -> logWarn "unimplemented"
   UpdateRuleset repository desired current -> do
     mrid <-

@@ -46,3 +46,5 @@ instance
     postGitHub $ "/repos/" <> owner <> "/" <> name
   updateRepositoryRuleset owner name rid =
     putGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets/" <> show rid
+  createRepositoryRuleset owner name =
+    postGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
