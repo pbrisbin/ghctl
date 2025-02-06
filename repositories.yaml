@@ -53,6 +53,36 @@ rulesets:
 ---
 repository:
   <<: *oss-repository
+  full_name: pbrisbin/ghctl
+  description: CLI for maintaining GitHub settings as IaC
+
+branch_protection: null
+
+rulesets:
+  - name: main
+    target: branch
+    enforcement: active
+    bypass_actors: *default-bypass-actors
+    conditions: *default-conditions
+
+    rules:
+      - type: deletion
+      - type: non_fast_forward
+      - type: pull_request
+        parameters:
+          <<: *default-pull-request-rule-parameters
+      - type: required_status_checks
+        parameters:
+          required_status_checks:
+            - context: test
+              integration_id: 15368 # GitHub Actions
+            - context: restyled
+              integration_id: 15368 # GitHub Actions
+          strict_required_status_checks_policy: false
+
+---
+repository:
+  <<: *oss-repository
   full_name: pbrisbin/hs-shellwords
   description: Parse a string into words, like a shell would
 
