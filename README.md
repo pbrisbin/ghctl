@@ -65,6 +65,6 @@ Available options:
 
 [Example](./repositories.yaml)
 
----
+## License
 
-[CHANGELOG.md](./CHANGELOG.md) | [LICENSE](./LICENSE)
+This project is licensed AGPLv3. See [COPYING](./COPYING).
