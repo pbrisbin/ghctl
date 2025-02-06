@@ -8,7 +8,7 @@ import GHCTL.RepositoryFullName
 
 data Repository = Repository
   { full_name :: RepositoryFullName
-  , description :: Text
+  , description :: Maybe Text
   , private :: Bool
   , has_issues :: Bool
   , has_projects :: Bool
