@@ -50,6 +50,7 @@ jobs:
         with:
           app-id: ${{ vars.AUTOMATION_APP_ID }}
           private-key: ${{ secrets.AUTOMATION_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
 
       - name: Assert no differences in ghctl-plan
         run: ghctl plan --fail-on-diff
