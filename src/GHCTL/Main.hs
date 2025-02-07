@@ -12,6 +12,7 @@ module GHCTL.Main
 
 import GHCTL.Prelude
 
+import Blammo.Logging.Logger (HasLogger)
 import GHCTL.App
 import GHCTL.Change
 import GHCTL.Change.Apply
@@ -27,7 +28,22 @@ main :: IO ()
 main = do
   options <- parseOptions
 
-  runAppM $ case options.command of
+  runAppM $ do
+    run options `catch` \err -> do
+      logGitHubClientError err
+      exitFailure
+
+run
+  :: ( HasLogger env
+     , MonadGitHub m
+     , MonadLogger m
+     , MonadReader env m
+     , MonadUnliftIO m
+     )
+  => Options
+  -> m ()
+run options =
+  case options.command of
     Plan failOnDiff failOnDiffExitCode -> do
       diff <- forChanges options.path prettyPrintChange
       when (diff && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
