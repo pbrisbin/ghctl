@@ -45,6 +45,7 @@ sourceChanges
 sourceChanges as bs =
   yield (These as bs)
     .| pairTheseOnC (.repository.full_name)
+    .| filterTheseC (/=)
     .| with
       getRepository
       ( \repository ->
