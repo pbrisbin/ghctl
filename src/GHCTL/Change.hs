@@ -8,120 +8,61 @@
 -- Portability : POSIX
 module GHCTL.Change
   ( Change (..)
-  , planChanges
+  , Attribute (..)
+  , sourceChanges
   ) where
 
 import GHCTL.Prelude
 
-import Conduit
 import Data.These.Combinators (bimapThese)
 import GHCTL.BranchProtection
+import GHCTL.Conduit
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
 import GHCTL.Ruleset
 
 data Change
-  = CreateRepository Repository
-  | DeleteRepository Repository
-  | UpdateRepository Repository Repository
-  | CreateBranchProtection Repository BranchProtection
-  | DeleteBranchProtection Repository BranchProtection
-  | UpdateBranchProtection Repository BranchProtection BranchProtection
-  | CreateRuleset Repository Ruleset
-  | DeleteRuleset Repository Ruleset
-  | UpdateRuleset Repository Ruleset Ruleset
+  = ChangeRepository (Attribute Repository)
+  | ChangeBranchProtection (Attribute BranchProtection)
+  | ChangeRuleset (Attribute Ruleset)
   deriving stock (Generic, Show)
   deriving anyclass (ToJSON) -- logging
 
-planChanges
-  :: [RepositoriesYaml]
+data Attribute a = Attribute
+  { repository :: Repository
+  , desiredCurrent :: These a a
+  }
+  deriving stock (Generic, Show)
+  deriving anyclass (ToJSON) -- logging
+
+sourceChanges
+  :: Monad m
+  => [RepositoriesYaml]
   -> [RepositoriesYaml]
-  -> [Change]
-planChanges as bs =
-  concat
-    $ runIdentity
-    $ runConduit
-    $ pairListOn (.repository.full_name) as bs
-    .| sequenceSinks changeSinks
+  -> ConduitT () Change m ()
+sourceChanges as bs =
+  yield (These as bs)
+    .| pairTheseOnC (.repository.full_name)
+    .| with
+      getRepository
+      ( \repository ->
+          sequenceSinks_
+            [ bothTheseC (.repository)
+                .| filterTheseC (/=)
+                .| mapC (ChangeRepository . Attribute repository)
+            , bothTheseC (.branch_protection)
+                .| catTheseMaybesC
+                .| filterTheseC (/=)
+                .| mapC (ChangeBranchProtection . Attribute repository)
+            , bothTheseC (.rulesets)
+                .| pairTheseOnC (.name)
+                .| filterTheseC (/=)
+                .| mapC (ChangeRuleset . Attribute repository)
+            ]
+      )
 
-changeSinks
-  :: Monad m
-  => [ConduitT (These RepositoriesYaml RepositoriesYaml) Void m [Change]]
-changeSinks =
-  [ repositoryChanges .| sinkList
-  , branchProtectionChanges .| sinkList
-  , rulesetChanges .| sinkList
-  ]
+getRepository :: These RepositoriesYaml RepositoriesYaml -> Repository
+getRepository = mergeThese const . bimapThese (.repository) (.repository)
 
-repositoryChanges
-  :: Monad m
-  => ConduitT (These RepositoriesYaml RepositoriesYaml) Change m ()
-repositoryChanges =
-  mapC (bimapThese (.repository) (.repository))
-    .| theseToChanges CreateRepository DeleteRepository UpdateRepository
-
-branchProtectionChanges
-  :: Monad m
-  => ConduitT (These RepositoriesYaml RepositoriesYaml) Change m ()
-branchProtectionChanges = awaitForever $ \case
-  This a -> traverse_ (yield . CreateBranchProtection a.repository) a.branch_protection
-  That _ -> pure () -- nothing to do
-  These a b ->
-    pairMaybes a.branch_protection b.branch_protection
-      .| theseToChanges
-        (CreateBranchProtection a.repository)
-        (DeleteBranchProtection a.repository)
-        (UpdateBranchProtection a.repository)
-
-rulesetChanges
-  :: Monad m
-  => ConduitT (These RepositoriesYaml RepositoriesYaml) Change m ()
-rulesetChanges = awaitForever $ \case
-  This a -> traverse_ (yield . CreateRuleset a.repository) a.rulesets
-  That _ -> pure () -- nothing to do
-  These a b ->
-    pairListOn (.name) a.rulesets b.rulesets
-      .| theseToChanges
-        (CreateRuleset a.repository)
-        (DeleteRuleset a.repository)
-        (UpdateRuleset a.repository)
-
-theseToChanges
-  :: forall m a
-   . (Eq a, Monad m)
-  => (a -> Change)
-  -- ^ create
-  -> (a -> Change)
-  -- ^ delete
-  -> (a -> a -> Change)
-  -- ^ update
-  -> ConduitT (These a a) Change m ()
-theseToChanges toCreate toDelete toUpdate = awaitForever $ \case
-  This a -> yield $ toCreate a
-  That b -> yield $ toDelete b
-  These a b -> when (a /= b) $ yield $ toUpdate a b
-
-pairMaybes
-  :: Monad m
-  => Maybe a
-  -> Maybe b
-  -> ConduitT i (These a b) m ()
-pairMaybes = curry $ \case
-  (Nothing, Nothing) -> pure ()
-  (Just a, Nothing) -> yield $ This a
-  (Nothing, Just b) -> yield $ That b
-  (Just a, Just b) -> yield $ These a b
-
-pairListOn
-  :: forall m k a i
-   . (Monad m, Ord k)
-  => (a -> k)
-  -> [a]
-  -> [a]
-  -> ConduitT i (These a a) m ()
-pairListOn _ [] bs = yieldMany $ map That bs
-pairListOn _ as [] = yieldMany $ map This as
-pairListOn f (a : as) (b : bs) = case comparing f a b of
-  EQ -> yield (These a b) >> pairListOn f as bs
-  LT -> yield (This a) >> pairListOn f as (b : bs)
-  GT -> yield (That b) >> pairListOn f (a : as) bs
+with :: Monad m => (i -> a) -> (a -> ConduitT i o m ()) -> ConduitT i o m ()
+with f g = awaitForever $ \i -> g $ f i

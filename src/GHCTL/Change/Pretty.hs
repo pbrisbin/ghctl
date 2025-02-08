@@ -27,116 +27,64 @@ prettyPrintChange
   :: (HasLogger env, MonadIO m, MonadReader env m) => Change -> m ()
 prettyPrintChange change = do
   colors <- getColorsLogger
-  pushLoggerLn $ renderChangeDescription colors $ toChangeDescription change
+  pushLoggerLn $ case change of
+    ChangeRepository attr ->
+      renderAttribute colors "REPOSITORY" (const Nothing) attr
+    ChangeBranchProtection attr ->
+      renderAttribute
+        colors
+        "BRANCH_PROTECTION"
+        (const $ Just $ attr.repository.default_branch)
+        attr
+    ChangeRuleset attr ->
+      renderAttribute colors "RULESET" (Just . (.name)) attr
 
-data ChangeDescription = ChangeDescription
-  { action :: Action
-  , target :: Text
-  , repository :: Repository
-  , name :: Maybe Text
-  , diff :: Maybe [Diff Text]
-  }
-
-data Action = Create | Update | Delete
-
-toChangeDescription :: Change -> ChangeDescription
-toChangeDescription = \case
-  CreateRepository repository ->
-    ChangeDescription
-      { action = Create
-      , target = "REPOSITORY"
-      , repository = repository
-      , name = Nothing
-      , diff = Nothing
-      }
-  DeleteRepository repository ->
-    ChangeDescription
-      { action = Delete
-      , target = "REPOSITORY"
-      , repository = repository
-      , name = Nothing
-      , diff = Nothing
-      }
-  UpdateRepository desired current ->
-    ChangeDescription
-      { action = Update
-      , target = "REPOSITORY"
-      , repository = desired
-      , name = Nothing
-      , diff = Just $ jsonDiff current desired
-      }
-  CreateBranchProtection repository _ ->
-    ChangeDescription
-      { action = Create
-      , target = "BRANCH_PROTECTION"
-      , repository = repository
-      , name = Just repository.default_branch
-      , diff = Nothing
-      }
-  DeleteBranchProtection repository _ ->
-    ChangeDescription
-      { action = Delete
-      , target = "BRANCH_PROTECTION"
-      , repository = repository
-      , name = Just repository.default_branch
-      , diff = Nothing
-      }
-  UpdateBranchProtection repository desired current ->
-    ChangeDescription
-      { action = Update
-      , target = "BRANCH_PROTECTION"
-      , repository = repository
-      , name = Just repository.default_branch
-      , diff = Just $ jsonDiff current desired
-      }
-  CreateRuleset repository ruleset ->
-    ChangeDescription
-      { action = Create
-      , target = "RULESET"
-      , repository = repository
-      , name = Just ruleset.name
-      , diff = Nothing
-      }
-  DeleteRuleset repository ruleset ->
-    ChangeDescription
-      { action = Delete
-      , target = "RULESET"
-      , repository = repository
-      , name = Just ruleset.name
-      , diff = Nothing
-      }
-  UpdateRuleset repository desired current ->
-    ChangeDescription
-      { action = Update
-      , target = "RULESET"
-      , repository = repository
-      , name = Just desired.name
-      , diff = Just $ jsonDiff current desired
-      }
-
-renderChangeDescription :: Colors -> ChangeDescription -> Text
-renderChangeDescription Colors {..} ci =
-  unlines $ titleLine : maybe [] renderDiffLines ci.diff
+renderAttribute
+  :: ToJSON a
+  => Colors
+  -> Text
+  -> (a -> Maybe Text)
+  -> Attribute a
+  -> Text
+renderAttribute colors@Colors {..} target getName attr =
+  title <> maybe "" (unlines . ("" :)) diff
  where
-  titleLine :: Text
-  titleLine =
+  title :: Text
+  title =
     unwords
-      [ case ci.action of
-          Create -> green "CREATE"
-          Update -> yellow "UPDATE"
-          Delete -> red "DELETE"
-      , bold ci.target
-      , magenta (toText ci.repository.full_name)
-      , maybe "" (\n -> dim "name=" <> cyan n) ci.name
+      [ action
+      , bold target
+      , magenta (toText attr.repository.full_name)
+      , maybe "" (\n -> dim "name=" <> cyan n) name
       ]
 
-  renderDiffLines :: [Diff Text] -> [Text]
-  renderDiffLines =
-    (red "--- current" :)
-      . (green "+++ desired" :)
-      . map colorizeDiffLine
+  action :: Text
+  action = case attr.desiredCurrent of
+    This _ -> green "CREATE"
+    That _ -> red "DELETE"
+    These _ _ -> yellow "UPDATE"
 
-  colorizeDiffLine = \case
-    Diff.First t -> red $ "-" <> t
-    Diff.Second t -> green $ "+" <> t
-    Diff.Both t _ -> dim $ " " <> t
+  name :: Maybe Text
+  name = case attr.desiredCurrent of
+    This a -> getName a
+    That b -> getName b
+    These _ b -> getName b
+
+  diff :: Maybe [Text]
+  diff = case attr.desiredCurrent of
+    This _ -> Nothing
+    That _ -> Nothing
+    These a b -> Just $ renderDiffLines colors $ jsonDiff a b
+
+renderDiffLines :: Colors -> [Diff Text] -> [Text]
+renderDiffLines colors@Colors {..} diff =
+  [ red "--- current"
+  , green "+++ desired"
+  ]
+    <> map (colorizeDiffLine colors) diff
+
+colorizeDiffLine :: Colors -> Diff Text -> Text
+colorizeDiffLine Colors {..} = \case
+  Diff.First t -> red $ "-" <> t
+  Diff.Second t -> green $ "+" <> t
+  Diff.Both t _ -> dim $ " " <> t

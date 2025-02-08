@@ -19,6 +19,7 @@ import Data.Yaml qualified as Yaml
 import GHCTL.BranchProtection
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub qualified as GitHub
+import GHCTL.PathArg
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
@@ -28,14 +29,30 @@ data RepositoriesYaml = RepositoriesYaml
   , branch_protection :: Maybe BranchProtection
   , rulesets :: [Ruleset]
   }
-  deriving stock (Generic)
+  deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)
 
 renderRepositoriesYaml :: [RepositoriesYaml] -> ByteString
 renderRepositoriesYaml = mconcat . map (("\n\n---\n" <>) . Yaml.encode)
 
-getDesiredRepositoriesYaml :: MonadIO m => ByteString -> m [RepositoriesYaml]
-getDesiredRepositoriesYaml = liftIO . Yaml.decodeAllThrow
+getDesiredRepositoriesYaml
+  :: (MonadIO m, MonadLogger m) => PathArg -> m [RepositoriesYaml]
+getDesiredRepositoriesYaml pathArg = do
+  bytes <- getPathArgBytes pathArg
+
+  case Yaml.decodeAllThrow bytes of
+    Left ex -> do
+      let
+        message :: Text
+        message =
+          ("Exception decoding repositories file:\n" <>)
+            $ pack
+            $ maybe (displayException ex) Yaml.prettyPrintParseException
+            $ fromException ex
+
+      logError $ message :# ["path" .= showPathArg pathArg]
+      exitFailure
+    Right yamls -> pure yamls
 
 getCurrentRepositoriesYaml
   :: MonadGitHub m => [RepositoryFullName] -> m [RepositoriesYaml]

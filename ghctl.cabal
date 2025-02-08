@@ -29,6 +29,8 @@ library
       GHCTL.Change
       GHCTL.Change.Apply
       GHCTL.Change.Pretty
+      GHCTL.Conduit
+      GHCTL.CRUD
       GHCTL.Diff
       GHCTL.GitHub
       GHCTL.GitHub.Actual
@@ -38,6 +40,7 @@ library
       GHCTL.Identified
       GHCTL.Main
       GHCTL.Options
+      GHCTL.PathArg
       GHCTL.Prelude
       GHCTL.RepositoriesYaml
       GHCTL.Repository
