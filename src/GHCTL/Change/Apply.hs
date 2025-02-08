@@ -22,6 +22,7 @@ applyChange = \case
   ChangeRepository attr -> applyAttributeChange attr
   ChangeBranchProtection attr -> applyAttributeChange attr
   ChangeRuleset attr -> applyAttributeChange attr
+  ChangeVariable attr -> applyAttributeChange attr
 
 applyAttributeChange :: HasCRUD a m => Attribute a -> m ()
 applyAttributeChange Attribute {repository, desiredCurrent} = case desiredCurrent of

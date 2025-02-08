@@ -23,11 +23,13 @@ import GHCTL.PathArg
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
+import GHCTL.Variable
 
 data RepositoriesYaml = RepositoriesYaml
   { repository :: Repository
   , branch_protection :: Maybe BranchProtection
   , rulesets :: [Ruleset]
+  , variables :: [Variable]
   }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)
@@ -73,4 +75,6 @@ getCurrent name = do
       rs <- GitHub.getAllRepositoryRulesets name.owner name.name
       traverse (GitHub.getRepositoryRuleset name.owner name.name . (.id)) rs
 
-    pure RepositoriesYaml {repository, branch_protection, rulesets}
+    Variables {variables} <- GitHub.listRepositoryVariables name.owner name.name
+
+    pure RepositoriesYaml {repository, branch_protection, rulesets, variables}

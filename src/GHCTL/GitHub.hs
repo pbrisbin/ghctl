@@ -17,6 +17,7 @@ import GHCTL.BranchProtection
 import GHCTL.Identified
 import GHCTL.Repository
 import GHCTL.Ruleset
+import GHCTL.Variable
 
 class Monad m => MonadGitHub m where
   getRepository :: Text -> Text -> m (Maybe Repository)
@@ -31,6 +32,8 @@ class Monad m => MonadGitHub m where
   getRepositoryRulesetIdByName owner repo name = do
     rulesets <- getAllRepositoryRulesets owner repo
     pure $ (.id) <$> find ((== name) . (.name)) rulesets
+
+  listRepositoryVariables :: Text -> Text -> m Variables
 
   updateRepository :: Text -> Text -> Repository -> m ()
 

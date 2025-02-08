@@ -20,11 +20,13 @@ import GHCTL.Conduit
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
 import GHCTL.Ruleset
+import GHCTL.Variable
 
 data Change
   = ChangeRepository (Attribute Repository)
   | ChangeBranchProtection (Attribute BranchProtection)
   | ChangeRuleset (Attribute Ruleset)
+  | ChangeVariable (Attribute Variable)
   deriving stock (Generic, Show)
   deriving anyclass (ToJSON) -- logging
 
@@ -58,6 +60,10 @@ sourceChanges as bs =
                 .| pairTheseOnC (.name)
                 .| filterTheseC (/=)
                 .| mapC (ChangeRuleset . Attribute repository)
+            , bothTheseC (.variables)
+                .| pairTheseOnC (.name)
+                .| filterTheseC (/=)
+                .| mapC (ChangeVariable . Attribute repository)
             ]
       )
 

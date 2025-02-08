@@ -50,6 +50,8 @@ instance
     getGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
   getRepositoryRuleset owner name rid =
     getGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets/" <> show rid
+  listRepositoryVariables owner name =
+    getGitHub $ "/repos/" <> owner <> "/" <> name <> "/actions/variables"
   updateRepository owner name =
     postGitHub $ "/repos/" <> owner <> "/" <> name
   updateRepositoryRuleset owner name rid =
