@@ -13,6 +13,7 @@ module GHCTL.Main
 import GHCTL.Prelude
 
 import Blammo.Logging.Logger (HasLogger)
+import Conduit
 import GHCTL.App
 import GHCTL.Change
 import GHCTL.Change.Apply
@@ -20,6 +21,7 @@ import GHCTL.Change.Pretty
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
+import GHCTL.PathArg
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
 import System.Exit (ExitCode (..))
@@ -42,44 +44,33 @@ run
      )
   => Options
   -> m ()
-run options =
+run options = do
+  logInfo $ "Loading desired state" :# ["path" .= showPathArg options.path]
+  desired <- getDesiredRepositoriesYaml options.path
+
+  let names = map (.repository.full_name) desired
+  logInfo $ "Loading current state" :# ["count" .= show @Text (length names)]
+  current <- getCurrentRepositoriesYaml names
+
   case options.command of
     Plan failOnDiff failOnDiffExitCode -> do
-      diff <- forChanges options.path prettyPrintChange
-      when (diff && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
-    Apply -> forChanges_ options.path $ \c -> do
-      prettyPrintChange c
-      applyChange c `catch` \err -> do
-        logGitHubClientError err
-        exitFailure
-    Import fullNames -> do
-      current <- getCurrentRepositoriesYaml $ toList fullNames
-      appendPathArgBytes options.path $ renderRepositoriesYaml current
+      logInfo "Sourcing differences"
+      diff <-
+        runConduit
+          $ sourceChanges desired current
+          .| iterMC prettyPrintChange
+          .| lengthC @_ @Int
 
-forChanges_
-  :: (MonadGitHub m, MonadIO m, MonadLogger m)
-  => PathArg
-  -> (Change -> m ())
-  -> m ()
-forChanges_ pathArg f = void $ forChanges pathArg f
-
--- | Run an action on each 'Change'
---
--- Returns 'False' if there were no changes, 'True' otherwise.
-forChanges
-  :: (MonadGitHub m, MonadIO m, MonadLogger m)
-  => PathArg
-  -> (Change -> m a)
-  -> m Bool
-forChanges pathArg f = do
-  mChanges <- nonEmpty <$> buildChanges pathArg
-  maybe
-    (False <$ logInfo "All repositories up to date")
-    ((True <$) . traverse_ f)
-    mChanges
-
-buildChanges :: (MonadGitHub m, MonadIO m) => PathArg -> m [Change]
-buildChanges pathArg = do
-  desired <- getDesiredRepositoriesYaml =<< getPathArgBytes pathArg
-  current <- getCurrentRepositoriesYaml $ map (.repository.full_name) desired
-  pure $ planChanges desired current
+      logInfo $ ("Repository differences: " <> show diff) :# []
+      when (diff > 0 && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
+    Apply -> do
+      logInfo "Applying differences"
+      runConduit
+        $ sourceChanges desired current
+        .| iterMC prettyPrintChange
+        .| iterMC applyChange
+        .| sinkNull
+    Import inames -> do
+      logInfo $ "Importing repositories" :# ["count" .= show @Text (length inames)]
+      toImport <- getCurrentRepositoriesYaml $ toList inames
+      appendPathArgBytes options.path $ renderRepositoriesYaml toImport

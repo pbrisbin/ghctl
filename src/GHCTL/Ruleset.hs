@@ -12,7 +12,7 @@ module GHCTL.Ruleset
 
 import GHCTL.Prelude
 
-import Data.Aeson (Value, genericParseJSON, genericToEncoding, genericToJSON)
+import Data.Aeson (genericParseJSON, genericToEncoding, genericToJSON)
 import Data.Aeson qualified as Aeson
 import Data.List.Extra (dropPrefix)
 import GHCTL.RulesetEnforcement
@@ -31,7 +31,7 @@ data Ruleset = Ruleset
 
 data RulesetBypassActor = RulesetBypassActor
   { actor_type :: BypassActorType
-  , actor_id :: Maybe Value
+  , actor_id :: Maybe Int
   , bypass_mode :: BypassMode
   }
   deriving stock (Eq, Generic, Show)
@@ -137,7 +137,7 @@ data RulesetRuleRequiredStatusChecksParameters = RulesetRuleRequiredStatusChecks
 
 data RequiredStatusCheck = RequiredStatusCheck
   { context :: Text
-  , integration_id :: Maybe Value
+  , integration_id :: Maybe Int
   }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)
