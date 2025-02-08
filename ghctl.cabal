@@ -48,6 +48,7 @@ library
       GHCTL.Ruleset
       GHCTL.RulesetEnforcement
       GHCTL.TextBoundedEnum
+      GHCTL.Variable
   other-modules:
       Paths_ghctl
   hs-source-dirs:

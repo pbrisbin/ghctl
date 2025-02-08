@@ -22,6 +22,7 @@ import GHCTL.Change
 import GHCTL.Diff
 import GHCTL.Repository
 import GHCTL.Ruleset
+import GHCTL.Variable
 
 prettyPrintChange
   :: (HasLogger env, MonadIO m, MonadReader env m) => Change -> m ()
@@ -38,6 +39,8 @@ prettyPrintChange change = do
         attr
     ChangeRuleset attr ->
       renderAttribute colors "RULESET" (Just . (.name)) attr
+    ChangeVariable attr ->
+      renderAttribute colors "VARIABLE" (Just . (.name)) attr
 
 renderAttribute
   :: ToJSON a

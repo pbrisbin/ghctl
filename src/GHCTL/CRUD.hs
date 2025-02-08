@@ -18,6 +18,7 @@ import GHCTL.GitHub qualified as GitHub
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
+import GHCTL.Variable
 
 class HasCRUD a m where
   create :: Repository -> a -> m ()
@@ -68,4 +69,9 @@ instance (MonadGitHub m, MonadLogger m) => HasCRUD Ruleset m where
           rid
           desired
 
+  delete = error "unimplemented"
+
+instance HasCRUD Variable m where
+  create = error "unimplemented"
+  update = error "unimplemented"
   delete = error "unimplemented"
