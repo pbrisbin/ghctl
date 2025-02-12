@@ -1,5 +1,5 @@
 ---
-repository: &oss-repository
+repository:
   full_name: pbrisbin/escaped
   description: Produce Text with terminal escape sequences
   private: false
@@ -20,14 +20,14 @@ rulesets:
   - name: main
     target: branch
     enforcement: active
-    bypass_actors: &default-bypass-actors
+    bypass_actors:
       - actor_type: RepositoryRole
         actor_id: 5 # Admin
         bypass_mode: always
       - actor_type: Integration
         actor_id: 927225 # @pbrisbin-automation
         bypass_mode: always
-    conditions: &default-conditions
+    conditions:
       ref_name:
         exclude: []
         include:
@@ -36,7 +36,7 @@ rulesets:
       - type: deletion
       - type: non_fast_forward
       - type: pull_request
-        parameters: &default-pull-request-rule-parameters
+        parameters:
           allowed_merge_methods: [rebase]
           dismiss_stale_reviews_on_push: false
           require_code_owner_review: false
@@ -54,9 +54,19 @@ variables: []
 
 ---
 repository:
-  <<: *oss-repository
   full_name: pbrisbin/ghctl
   description: CLI for maintaining GitHub settings as IaC
+  private: false
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  default_branch: main
+  allow_squash_merge: false
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+  allow_update_branch: true
 
 branch_protection: null
 
@@ -64,15 +74,30 @@ rulesets:
   - name: main
     target: branch
     enforcement: active
-    bypass_actors: *default-bypass-actors
-    conditions: *default-conditions
+    bypass_actors:
+      - actor_type: RepositoryRole
+        actor_id: 5 # Admin
+        bypass_mode: always
+      - actor_type: Integration
+        actor_id: 927225 # @pbrisbin-automation
+        bypass_mode: always
+    conditions:
+      ref_name:
+        exclude: []
+        include:
+          - "~DEFAULT_BRANCH"
 
     rules:
       - type: deletion
       - type: non_fast_forward
       - type: pull_request
         parameters:
-          <<: *default-pull-request-rule-parameters
+          allowed_merge_methods: [rebase]
+          dismiss_stale_reviews_on_push: false
+          require_code_owner_review: false
+          require_last_push_approval: false
+          required_approving_review_count: 0
+          required_review_thread_resolution: true
       - type: required_status_checks
         parameters:
           required_status_checks:
@@ -88,9 +113,19 @@ variables:
 
 ---
 repository:
-  <<: *oss-repository
   full_name: pbrisbin/hs-shellwords
   description: Parse a string into words, like a shell would
+  private: false
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  default_branch: main
+  allow_squash_merge: false
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+  allow_update_branch: true
 
 branch_protection: null
 
@@ -98,15 +133,30 @@ rulesets:
   - name: main
     target: branch
     enforcement: active
-    bypass_actors: *default-bypass-actors
-    conditions: *default-conditions
+    bypass_actors:
+      - actor_type: RepositoryRole
+        actor_id: 5 # Admin
+        bypass_mode: always
+      - actor_type: Integration
+        actor_id: 927225 # @pbrisbin-automation
+        bypass_mode: always
+    conditions:
+      ref_name:
+        exclude: []
+        include:
+          - "~DEFAULT_BRANCH"
 
     rules:
       - type: deletion
       - type: non_fast_forward
       - type: pull_request
         parameters:
-          <<: *default-pull-request-rule-parameters
+          allowed_merge_methods: [rebase]
+          dismiss_stale_reviews_on_push: false
+          require_code_owner_review: false
+          require_last_push_approval: false
+          required_approving_review_count: 0
+          required_review_thread_resolution: true
       - type: required_status_checks
         parameters:
           required_status_checks:
@@ -124,11 +174,21 @@ variables:
 
 ---
 repository:
-  <<: *oss-repository
   full_name: pbrisbin/setup-tool-action
   description: >-
     Generic action for installation of any tool that offers pre-compiled
     binaries for download
+  private: false
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  default_branch: main
+  allow_squash_merge: false
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_auto_merge: true
+  delete_branch_on_merge: true
+  allow_update_branch: true
 
 branch_protection: null
 
@@ -136,15 +196,30 @@ rulesets:
   - name: main
     target: branch
     enforcement: active
-    bypass_actors: *default-bypass-actors
-    conditions: *default-conditions
+    bypass_actors:
+      - actor_type: RepositoryRole
+        actor_id: 5 # Admin
+        bypass_mode: always
+      - actor_type: Integration
+        actor_id: 927225 # @pbrisbin-automation
+        bypass_mode: always
+    conditions:
+      ref_name:
+        exclude: []
+        include:
+          - "~DEFAULT_BRANCH"
 
     rules:
       - type: deletion
       - type: non_fast_forward
       - type: pull_request
         parameters:
-          <<: *default-pull-request-rule-parameters
+          allowed_merge_methods: [rebase]
+          dismiss_stale_reviews_on_push: false
+          require_code_owner_review: false
+          require_last_push_approval: false
+          required_approving_review_count: 0
+          required_review_thread_resolution: true
       - type: required_status_checks
         parameters:
           required_status_checks:
