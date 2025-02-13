@@ -35,6 +35,9 @@ instance ToJSON RepositoryFullName where
   toJSON = toJSON . toText
   toEncoding = toEncoding . toText
 
+instance IsString RepositoryFullName where
+  fromString = either (error . pack) id . repositoryFullNameFromText . pack
+
 readRepositoryFullName :: String -> Either String RepositoryFullName
 readRepositoryFullName = repositoryFullNameFromText . pack
 
