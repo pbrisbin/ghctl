@@ -26,7 +26,6 @@ Available options:
 Available commands:
   plan                     show differences in desired and current state
   apply                    apply differences to current state
-  import                   import repository definitions
 ```
 
 ```console
@@ -50,18 +49,6 @@ Usage: ghctl apply
   apply differences to current state
 
 Available options:
-  -h,--help                Show this help text
-```
-
-```console
-% ghctl import --help
-Usage: ghctl import OWNER/REPO [OWNER/REPO]
-
-  import repository definitions
-
-Available options:
-  OWNER/REPO               Repository full name
-  OWNER/REPO               Repository full name
   -h,--help                Show this help text
 ```
 
