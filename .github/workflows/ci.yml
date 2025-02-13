@@ -15,10 +15,9 @@ jobs:
       - id: stack
         uses: freckle/stack-action@v5
 
-      # https://github.com/ocharles/weeder/issues/190
-      # - uses: freckle/weeder-action@v2
-      #   with:
-      #     ghc-version: ${{ steps.stack.outputs.compiler-version }}
+      - uses: freckle/weeder-action@v2
+        with:
+          ghc-version: ${{ steps.stack.outputs.compiler-version }}
 
       - uses: actions/upload-artifact@v4
         with:
