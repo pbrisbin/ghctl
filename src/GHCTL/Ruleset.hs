@@ -12,7 +12,7 @@ module GHCTL.Ruleset
 
 import GHCTL.Prelude
 
-import Data.Aeson (genericParseJSON, genericToEncoding, genericToJSON)
+import Data.Aeson (Value, genericParseJSON, genericToEncoding, genericToJSON)
 import Data.Aeson qualified as Aeson
 import Data.List.Extra (dropPrefix)
 import GHCTL.RulesetEnforcement
@@ -79,10 +79,27 @@ data IncludeExclude = IncludeExclude
   deriving anyclass (FromJSON, ToJSON)
 
 data RulesetRule
-  = RulesetRule_deletion
+  = RulesetRule_creation
+  | RulesetRule_update Value
+  | RulesetRule_deletion
+  | RulesetRule_required_linear_history
+  | RulesetRule_merge_queue Value
+  | RulesetRule_required_deployments Value
+  | RulesetRule_required_signatures
   | RulesetRule_pull_request RulesetRulePullRequestParameters
   | RulesetRule_required_status_checks RulesetRuleRequiredStatusChecksParameters
   | RulesetRule_non_fast_forward
+  | RulesetRule_commit_message_pattern Value
+  | RulesetRule_commit_author_email_pattern Value
+  | RulesetRule_committer_email_pattern Value
+  | RulesetRule_branch_name_pattern Value
+  | RulesetRule_tag_name_pattern Value
+  | RulesetRule_file_path_restrictions Value
+  | RulesetRule_max_file_path_length Value
+  | RulesetRule_file_extension_restriction Value
+  | RulesetRule_max_file_size Value
+  | RulesetRule_workflows Value
+  | RulesetRule_code_scanning Value
   deriving stock (Eq, Generic, Show)
 {-# ANN module ("HLint: ignore Use camelCase" :: Text) #-}
 
