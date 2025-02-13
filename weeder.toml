@@ -1,8 +1,3 @@
-roots = [
-  "^GHCTL\\.Main\\.main$",
-  "^Main\\.main$",
-  "^Paths_.*",
-  "^Spec\\.main$",
-]
+roots = ["^GHCTL\\.Main\\.main$", "^Main\\.main$", "^Paths_.*", "^Spec\\.main$"]
 
 type-class-roots = true
