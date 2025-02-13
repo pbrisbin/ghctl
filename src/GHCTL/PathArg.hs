@@ -3,7 +3,6 @@ module GHCTL.PathArg
   , readPathArg
   , showPathArg
   , getPathArgBytes
-  , appendPathArgBytes
   ) where
 
 import GHCTL.Prelude
@@ -39,9 +38,3 @@ getPathArgBytes = \case
   PathArgAbs p -> readFileBS $ toFilePath p
   PathArgRel p -> readFileBS $ toFilePath p
   PathArgStdin -> liftIO BS.getContents
-
-appendPathArgBytes :: MonadIO m => PathArg -> ByteString -> m ()
-appendPathArgBytes = \case
-  PathArgAbs p -> appendFileBS (toFilePath p)
-  PathArgRel p -> appendFileBS (toFilePath p)
-  PathArgStdin -> liftIO . BS.putStr

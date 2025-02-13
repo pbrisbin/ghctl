@@ -8,7 +8,6 @@
 -- Portability : POSIX
 module GHCTL.RepositoryFullName
   ( RepositoryFullName (..)
-  , readRepositoryFullName
   ) where
 
 import GHCTL.Prelude
@@ -37,9 +36,6 @@ instance ToJSON RepositoryFullName where
 
 instance IsString RepositoryFullName where
   fromString = either (error . pack) id . repositoryFullNameFromText . pack
-
-readRepositoryFullName :: String -> Either String RepositoryFullName
-readRepositoryFullName = repositoryFullNameFromText . pack
 
 repositoryFullNameFromText :: Text -> Either String RepositoryFullName
 repositoryFullNameFromText x = case T.splitOn "/" x of
