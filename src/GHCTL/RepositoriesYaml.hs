@@ -10,7 +10,6 @@ module GHCTL.RepositoriesYaml
   ( RepositoriesYaml (..)
   , getDesiredRepositoriesYaml
   , getCurrentRepositoriesYaml
-  , renderRepositoriesYaml
   ) where
 
 import GHCTL.Prelude
@@ -33,9 +32,6 @@ data RepositoriesYaml = RepositoriesYaml
   }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)
-
-renderRepositoriesYaml :: [RepositoriesYaml] -> ByteString
-renderRepositoriesYaml = mconcat . map (("\n\n---\n" <>) . Yaml.encode)
 
 getDesiredRepositoriesYaml
   :: (MonadIO m, MonadLogger m) => PathArg -> m [RepositoriesYaml]

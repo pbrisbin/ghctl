@@ -70,7 +70,3 @@ run options = do
         .| iterMC prettyPrintChange
         .| iterMC applyChange
         .| sinkNull
-    Import inames -> do
-      logInfo $ "Importing repositories" :# ["count" .= show @Text (length inames)]
-      toImport <- getCurrentRepositoriesYaml $ toList inames
-      appendPathArgBytes options.path $ renderRepositoriesYaml toImport

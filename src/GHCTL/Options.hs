@@ -16,9 +16,7 @@ module GHCTL.Options
 
 import GHCTL.Prelude
 
-import Data.List.NonEmpty (some1)
 import GHCTL.PathArg
-import GHCTL.RepositoryFullName
 import Options.Applicative
 import Path (relfile)
 
@@ -30,7 +28,6 @@ data Options = Options
 data Command
   = Plan Bool Int
   | Apply
-  | Import (NonEmpty RepositoryFullName)
 
 parseOptions :: IO Options
 parseOptions = execParser $ withInfo "" optionsParser
@@ -57,9 +54,6 @@ optionsParser =
           , command "apply"
               . withInfo "apply differences to current state"
               $ pure Apply
-          , command "import"
-              . withInfo "import repository definitions"
-              $ importParser
           ]
       )
 
@@ -80,17 +74,6 @@ planParser =
           , value 228
           , showDefault
           ]
-      )
-
-importParser :: Parser Command
-importParser =
-  Import
-    <$> some1
-      ( argument (eitherReader readRepositoryFullName)
-          $ mconcat
-            [ help "Repository full name"
-            , metavar "OWNER/REPO"
-            ]
       )
 
 withInfo :: String -> Parser a -> ParserInfo a
