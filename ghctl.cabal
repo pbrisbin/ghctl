@@ -39,6 +39,7 @@ library
       GHCTL.GitHub.Client.Error
       GHCTL.GitHub.Token
       GHCTL.Identified
+      GHCTL.LogFormatter
       GHCTL.Main
       GHCTL.Options
       GHCTL.PathArg
@@ -79,9 +80,11 @@ library
     , bytestring
     , conduit
     , extra
+    , http-client
     , http-conduit
     , http-types
     , lens
+    , monad-logger-aeson
     , optparse-applicative
     , path
     , relude

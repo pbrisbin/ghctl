@@ -23,6 +23,7 @@ import Data.Aeson qualified as Aeson
 import Data.ByteString.Lazy qualified as BSL
 import GHCTL.GitHub.Client.Error
 import GHCTL.GitHub.Token
+import Network.HTTP.Client qualified as HTTP
 import Network.HTTP.Simple
   ( addRequestHeader
   , getResponseBody
@@ -145,14 +146,13 @@ githubRequest GitHubRequest {path, method, body, onSuccess, onNotFound} = do
       . maybe id setRequestBodyJSON body
       <$> parseRequest ("https://api.github.com" <> unpack path)
 
-  logDebugNS "github" $ "=>" :# ["request" .= show @Text req]
+  logDebug $ decodeUtf8 (HTTP.method req <> " " <> HTTP.path req) :# []
+
   resp <- httpLBS req
 
   let
     status = getResponseStatus resp
     reqBody = getResponseBody resp
-
-  logDebugNS "github" $ "<=" :# ["status" .= statusCode status]
 
   if statusIsSuccessful status
     then either (throwIO . JSONDecodeError reqBody) pure $ onSuccess reqBody
