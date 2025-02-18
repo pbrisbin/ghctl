@@ -71,6 +71,7 @@ library
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
       Blammo
@@ -117,6 +118,7 @@ executable ghctl
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
       base <5
@@ -147,6 +149,7 @@ test-suite spec
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
       aeson

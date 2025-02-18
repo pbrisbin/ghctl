@@ -1,1 +1,2 @@
 - ignore: {name: "Redundant id"}
+- arguments: [-XQuasiQuotes]

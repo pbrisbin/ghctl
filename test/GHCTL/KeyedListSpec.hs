@@ -6,8 +6,6 @@
 -- Maintainer  : pbrisbin@gmail.com
 -- Stability   : experimental
 -- Portability : POSIX
-{-# LANGUAGE QuasiQuotes #-}
-
 module GHCTL.KeyedListSpec
   ( spec
   ) where
