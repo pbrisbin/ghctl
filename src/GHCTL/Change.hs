@@ -40,14 +40,14 @@ data Attribute a = Attribute
 
 sourceChanges
   :: MonadLogger m
-  => [RepositoriesYaml]
-  -> [RepositoriesYaml]
+  => [RepositoryYaml]
+  -> [RepositoryYaml]
   -> ConduitT () Change m ()
 sourceChanges as bs =
   yield (These as bs)
     .| pairTheseOnC (.repository.full_name)
     .| filterTheseC (/=)
-    .| iterMC (logDifferenceIn "RepositoriesYaml")
+    .| iterMC (logDifferenceIn "RepositoryYaml")
     .| with
       getRepository
       ( \repository ->
@@ -74,7 +74,7 @@ sourceChanges as bs =
             ]
       )
 
-getRepository :: These RepositoriesYaml RepositoriesYaml -> Repository
+getRepository :: These RepositoryYaml RepositoryYaml -> Repository
 getRepository = mergeThese const . bimapThese (.repository) (.repository)
 
 with :: Monad m => (i -> a) -> (a -> ConduitT i o m ()) -> ConduitT i o m ()

@@ -21,6 +21,7 @@ import GHCTL.Change.Pretty
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
+import GHCTL.PathArg
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
 import System.Exit (ExitCode (..))
@@ -44,8 +45,8 @@ run
   => Options
   -> m ()
 run options = do
-  logInfo $ "Loading desired state" :# ["directory" .= options.dir]
-  desired <- getDesiredRepositoriesYaml options.dir
+  logInfo $ "Loading desired state" :# ["path" .= showPathArg options.path]
+  desired <- getDesiredRepositoriesYaml options.path
 
   let
     names = map (.repository.full_name) desired

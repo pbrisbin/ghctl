@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 -- |
 --
 -- Module      : GHCTL.Options
@@ -14,11 +16,12 @@ module GHCTL.Options
 
 import GHCTL.Prelude
 
+import GHCTL.PathArg
 import Options.Applicative
-import Path (parseRelDir, reldir)
+import Path (relfile)
 
 data Options = Options
-  { dir :: Path Rel Dir
+  { path :: PathArg
   , command :: Command
   }
 
@@ -33,14 +36,14 @@ optionsParser :: Parser Options
 optionsParser =
   Options
     <$> option
-      (eitherReader $ first show . parseRelDir)
+      (eitherReader readPathArg)
       ( mconcat
-          [ short 'd'
-          , long "dir"
-          , help "Relative path to directory of repositories data"
-          , metavar "DIRECTORY"
-          , value [reldir|./.ghctl|]
-          , showDefaultWith toFilePath
+          [ short 'p'
+          , long "path"
+          , help "Path to repositories definition file"
+          , metavar "FILE"
+          , value (PathArgRel [relfile|./repositories.yaml|])
+          , showDefaultWith showPathArg
           ]
       )
     <*> subparser
