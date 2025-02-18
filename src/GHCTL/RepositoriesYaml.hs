@@ -38,7 +38,8 @@ data RepositoriesYaml = RepositoriesYaml
 getDesiredRepositoriesYaml
   :: (MonadIO m, MonadLogger m) => Path b Dir -> m [RepositoriesYaml]
 getDesiredRepositoriesYaml dir = do
-  defaults <- Yaml.decodeOptionalFile (object []) [relfile|defaults.yaml|]
+  defaults <-
+    Yaml.decodeOptionalFile (object []) $ dir </> [relfile|defaults.yaml|]
   Yaml.decodeAllDefaults defaults $ dir </> [relfile|repositories.yaml|]
 
 getCurrentRepositoriesYaml
