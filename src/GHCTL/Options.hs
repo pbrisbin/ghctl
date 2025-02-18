@@ -16,12 +16,11 @@ module GHCTL.Options
 
 import GHCTL.Prelude
 
-import GHCTL.PathArg
 import Options.Applicative
-import Path (relfile)
+import Path (reldir)
 
 data Options = Options
-  { path :: PathArg
+  { dir :: Path Rel Dir
   , command :: Command
   }
 
@@ -34,19 +33,8 @@ parseOptions = execParser $ withInfo "" optionsParser
 
 optionsParser :: Parser Options
 optionsParser =
-  Options
-    <$> option
-      (eitherReader readPathArg)
-      ( mconcat
-          [ short 'p'
-          , long "path"
-          , help "Path to repositories definition file"
-          , metavar "FILE"
-          , value (PathArgRel [relfile|./repositories.yaml|])
-          , showDefaultWith showPathArg
-          ]
-      )
-    <*> subparser
+  Options [reldir|.|]
+    <$> subparser
       ( mconcat
           [ command "plan"
               . withInfo "show differences in desired and current state"

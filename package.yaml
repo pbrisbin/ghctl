@@ -66,8 +66,8 @@ library:
     - monad-logger-aeson
     - optparse-applicative
     - path
+    - path-io
     - relude
-    - semigroupoids
     - text
     - these
     - unliftio
@@ -87,5 +87,8 @@ tests:
     source-dirs: test
     ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
     dependencies:
-      - hspec
+      - aeson
+      - aeson-pretty
+      - aeson-qq
       - ghctl
+      - hspec
