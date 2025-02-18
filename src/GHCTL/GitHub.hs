@@ -40,3 +40,5 @@ class Monad m => MonadGitHub m where
   updateRepositoryRuleset :: Text -> Text -> Int -> Ruleset -> m ()
 
   createRepositoryRuleset :: Text -> Text -> Ruleset -> m ()
+
+  createRepositoryVariable :: Text -> Text -> Variable -> m ()

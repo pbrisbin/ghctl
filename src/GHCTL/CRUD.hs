@@ -71,7 +71,11 @@ instance (MonadGitHub m, MonadLogger m) => HasCRUD Ruleset m where
 
   delete = error "unimplemented"
 
-instance HasCRUD Variable m where
-  create = error "unimplemented"
+instance MonadGitHub m => HasCRUD Variable m where
+  create repository =
+    GitHub.createRepositoryVariable
+      repository.full_name.owner
+      repository.full_name.name
+
   update = error "unimplemented"
   delete = error "unimplemented"

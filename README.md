@@ -16,39 +16,19 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-p|--path FILE] COMMAND
+Usage: ghctl [-p|--path FILE] [--apply] [--fail-on-diff] 
+             [--fail-on-diff-exit-code NUMBER] [OWNER/NAME]
+
+  Maintain GitHub settings
 
 Available options:
   -p,--path FILE           Path to repositories definition file
                            (default: repositories.yaml)
-  -h,--help                Show this help text
-
-Available commands:
-  plan                     show differences in desired and current state
-  apply                    apply differences to current state
-```
-
-```console
-% ghctl plan --help
-Usage: ghctl plan [--fail-on-diff] [--fail-on-diff-exit-code ARG]
-
-  show differences in desired and current state
-
-Available options:
-  --fail-on-diff           Fail if there are differences
-  --fail-on-diff-exit-code ARG
-                           Exit code to use when failing due to diff
-                           (default: 228)
-  -h,--help                Show this help text
-```
-
-```console
-% ghctl apply --help
-Usage: ghctl apply 
-
-  apply differences to current state
-
-Available options:
+  --apply                  Apply changes to make current state look like desired
+  --fail-on-diff           Fail if there are un-applied differences
+  --fail-on-diff-exit-code NUMBER
+                           Exit code for --fail-on-diff (default: 228)
+  OWNER/NAME               Limit processing to the given repositories
   -h,--help                Show this help text
 ```
 

@@ -29,7 +29,6 @@ library
       GHCTL.BranchProtection
       GHCTL.Change
       GHCTL.Change.Apply
-      GHCTL.Change.Pretty
       GHCTL.Conduit
       GHCTL.CRUD
       GHCTL.Diff

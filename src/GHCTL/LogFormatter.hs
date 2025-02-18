@@ -27,17 +27,19 @@ reformatLoggedMessage _ Colors {..} logLevel LoggedMessage {..} =
   encodeUtf8
     $ mconcat
       [ case logLevel of
-          LevelDebug -> blue "DEBUG:"
-          LevelInfo -> green " INFO:"
-          LevelWarn -> yellow " WARN:"
-          LevelError -> red "ERROR:"
-          LevelOther x -> gray $ T.take 5 x <> ":"
+          LevelDebug -> blue $ fixedWidth levelWidth "DEBUG" <> ":"
+          LevelInfo -> green $ fixedWidth levelWidth "INFO" <> ":"
+          LevelWarn -> yellow $ fixedWidth levelWidth "WARN" <> ":"
+          LevelError -> red $ fixedWidth levelWidth "ERROR" <> ":"
+          LevelOther x -> gray $ fixedWidth levelWidth x <> ":"
       , " " <> loggedMessageText
       , maybe "" (("\n" <>) . dim) $ do
           guard $ not $ KeyMap.null metaKeyMap
           pure $ encodePretty $ Object metaKeyMap
       ]
  where
+  levelWidth = 5
+
   metaKeyMap =
     maybe mempty (KeyMap.singleton "source" . String) loggedMessageLogSource
       <> loggedMessageThreadContext
@@ -54,3 +56,11 @@ encodePretty =
  where
   indent = T.replicate 7 " "
   conf = Pretty.defConfig {Pretty.confIndent = Pretty.Spaces 2}
+
+fixedWidth :: Int -> Text -> Text
+fixedWidth n t = case compare len n of
+  EQ -> t
+  GT -> T.take n t
+  LT -> T.replicate (n - len) " " <> t
+ where
+  len = T.length t

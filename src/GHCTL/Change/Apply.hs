@@ -25,7 +25,8 @@ applyChange = \case
   ChangeVariable attr -> applyAttributeChange attr
 
 applyAttributeChange :: HasCRUD a m => Attribute a -> m ()
-applyAttributeChange Attribute {repository, desiredCurrent} = case desiredCurrent of
-  This a -> CRUD.create repository a
-  That b -> CRUD.delete repository b
-  These a b -> CRUD.update repository a b
+applyAttributeChange Attribute {repository, desiredCurrent} =
+  case desiredCurrent of
+    This a -> CRUD.create repository a
+    That b -> CRUD.delete repository b
+    These a b -> CRUD.update repository a b

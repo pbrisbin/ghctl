@@ -10,27 +10,26 @@
 -- Portability : POSIX
 module GHCTL.Options
   ( Options (..)
-  , Command (..)
   , parseOptions
   ) where
 
 import GHCTL.Prelude
 
 import GHCTL.PathArg
+import GHCTL.RepositoryFullName
 import Options.Applicative
 import Path (relfile)
 
 data Options = Options
   { path :: PathArg
-  , command :: Command
+  , apply :: Bool
+  , failOnDiff :: Bool
+  , failOnDiffExitCode :: Int
+  , repositories :: Maybe (NonEmpty RepositoryFullName)
   }
 
-data Command
-  = Plan Bool Int
-  | Apply
-
 parseOptions :: IO Options
-parseOptions = execParser $ withInfo "" optionsParser
+parseOptions = execParser $ withInfo "Maintain GitHub settings" optionsParser
 
 optionsParser :: Parser Options
 optionsParser =
@@ -46,35 +45,37 @@ optionsParser =
           , showDefaultWith showPathArg
           ]
       )
-    <*> subparser
+    <*> switch
       ( mconcat
-          [ command "plan"
-              . withInfo "show differences in desired and current state"
-              $ planParser
-          , command "apply"
-              . withInfo "apply differences to current state"
-              $ pure Apply
+          [ long "apply"
+          , help "Apply changes to make current state look like desired"
           ]
       )
-
-planParser :: Parser Command
-planParser =
-  Plan
-    <$> switch
+    <*> switch
       ( mconcat
           [ long "fail-on-diff"
-          , help "Fail if there are differences"
+          , help "Fail if there are un-applied differences"
           ]
       )
     <*> option
       auto
       ( mconcat
           [ long "fail-on-diff-exit-code"
-          , help "Exit code to use when failing due to diff"
+          , help "Exit code for --fail-on-diff"
           , value 228
+          , metavar "NUMBER"
           , showDefault
           ]
       )
+    <*> (nonEmpty <$> many repositoryOption)
+
+repositoryOption :: Parser RepositoryFullName
+repositoryOption =
+  argument (eitherReader $ repositoryFullNameFromText . pack)
+    $ mconcat
+      [ help "Limit processing to the given repositories"
+      , metavar "OWNER/NAME"
+      ]
 
 withInfo :: String -> Parser a -> ParserInfo a
 withInfo d p = info (p <**> helper) $ fullDesc <> progDesc d
