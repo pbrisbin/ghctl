@@ -58,3 +58,5 @@ instance
     putGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets/" <> show rid
   createRepositoryRuleset owner name =
     postGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
+  createRepositoryVariable owner name =
+    postGitHub $ "/repos/" <> owner <> "/" <> name <> "/actions/variables"

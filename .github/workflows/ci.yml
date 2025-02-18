@@ -52,11 +52,10 @@ jobs:
           private-key: ${{ secrets.AUTOMATION_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - name: Assert no differences in ghctl-plan
-        run: ghctl plan --fail-on-diff
+      - name: Assert no differences in ghctl
+        run: ghctl --fail-on-diff
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
-          LOG_BREAKPOINT: 200
           LOG_COLOR: always
 
   lint:

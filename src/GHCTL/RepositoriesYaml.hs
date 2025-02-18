@@ -9,7 +9,7 @@
 module GHCTL.RepositoriesYaml
   ( RepositoryYaml (..)
   , getDesiredRepositoriesYaml
-  , getCurrentRepositoriesYaml
+  , getCurrentRepositoryYaml
   ) where
 
 import GHCTL.Prelude
@@ -52,15 +52,12 @@ getDesiredRepositoriesYaml pathArg = do
  where
   path = showPathArg pathArg
 
-getCurrentRepositoriesYaml
-  :: MonadGitHub m => [RepositoryFullName] -> m [RepositoryYaml]
-getCurrentRepositoriesYaml = foldMapM getCurrent
-
-getCurrent :: MonadGitHub m => RepositoryFullName -> m [RepositoryYaml]
-getCurrent name = do
+getCurrentRepositoryYaml
+  :: MonadGitHub m => RepositoryFullName -> m (Maybe RepositoryYaml)
+getCurrentRepositoryYaml name = do
   mRepo <- GitHub.getRepository name.owner name.name
 
-  fmap maybeToList $ for mRepo $ \repository -> do
+  for mRepo $ \repository -> do
     branch_protection <-
       GitHub.getBranchProtection
         name.owner

@@ -17,7 +17,6 @@ import Conduit
 import GHCTL.App
 import GHCTL.Change
 import GHCTL.Change.Apply
-import GHCTL.Change.Pretty
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
@@ -45,31 +44,34 @@ run
   => Options
   -> m ()
 run options = do
-  logInfo $ "Loading desired state" :# ["path" .= showPathArg options.path]
+  logDebug $ "Loading desired state" :# ["path" .= showPathArg options.path]
   desired <- getDesiredRepositoriesYaml options.path
+  changes <-
+    runConduit
+      $ yieldMany desired
+      .| filterC include
+      .| sourceChanges
+      .| iterMC apply
+      .| sinkList
 
-  let
-    names = map (.repository.full_name) desired
-    count = length names
+  logInfo
+    $ "Repositories sync complete"
+    :# [ "changesApplied" .= (if options.apply then length changes else 0)
+       , "changesFound" .= length changes
+       , "unchanged" .= (length desired - length changes)
+       ]
 
-  logInfo $ "Loading remote state" :# ["repositories" .= show @Text count]
-  current <- getCurrentRepositoriesYaml names
+  unless (null changes || options.apply || not options.failOnDiff) $ do
+    logError "Failing due to differences found (--fail-on-diff)"
+    exitWith $ ExitFailure options.failOnDiffExitCode
+ where
+  include =
+    maybe
+      (const True)
+      (\names -> (`elem` names) . (.repository.full_name))
+      options.repositories
 
-  case options.command of
-    Plan failOnDiff failOnDiffExitCode -> do
-      logInfo "Sourcing differences"
-      diff <-
-        runConduit
-          $ sourceChanges current desired
-          .| iterMC prettyPrintChange
-          .| lengthC @_ @Int
-
-      logInfo $ ("Repository differences: " <> show diff) :# []
-      when (diff > 0 && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
-    Apply -> do
-      logInfo "Sourcing and applying differences"
-      runConduit
-        $ sourceChanges current desired
-        .| iterMC prettyPrintChange
-        .| iterMC applyChange
-        .| sinkNull
+  apply change =
+    when options.apply $ do
+      logInfo "Applying change"
+      applyChange change

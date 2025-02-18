@@ -8,6 +8,7 @@
 -- Portability : POSIX
 module GHCTL.RepositoryFullName
   ( RepositoryFullName (..)
+  , repositoryFullNameFromText
   ) where
 
 import GHCTL.Prelude
