@@ -1,1 +1,6 @@
 resolver: lts-23.7
+extra-deps:
+  - github: freckle/blammo
+    commit: b4bc071b0a9f855b72143ae8d10e2bed04648f0d
+    subdirs:
+      - Blammo

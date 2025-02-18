@@ -13,11 +13,13 @@ module GHCTL.App
 
 import GHCTL.Prelude
 
+import Blammo.Logging.Logger
 import Blammo.Logging.Simple
 import Control.Lens
 import GHCTL.GitHub (MonadGitHub (..))
 import GHCTL.GitHub.Actual
 import GHCTL.GitHub.Token
+import GHCTL.LogFormatter
 
 data App = App
   { logger :: Logger
@@ -48,5 +50,5 @@ newtype AppM a = AppM
 runAppM :: AppM a -> IO a
 runAppM f = do
   withLoggerEnv $ \logger -> do
-    app <- App logger <$> envGitHubToken
+    app <- App (setLoggerReformat reformatLoggedMessage logger) <$> envGitHubToken
     runReaderT f.unwrap app

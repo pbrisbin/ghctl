@@ -15,6 +15,7 @@ import GHCTL.Prelude
 import Data.Aeson (Value, genericParseJSON, genericToEncoding, genericToJSON)
 import Data.Aeson qualified as Aeson
 import Data.List.Extra (dropPrefix)
+import GHCTL.KeyedList
 import GHCTL.RulesetEnforcement
 import GHCTL.TextBoundedEnum
 
@@ -24,7 +25,7 @@ data Ruleset = Ruleset
   , enforcement :: RulesetEnforcement
   , bypass_actors :: [RulesetBypassActor]
   , conditions :: Maybe RulesetCondition
-  , rules :: [RulesetRule]
+  , rules :: KeyedList "type" RulesetRule
   }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)

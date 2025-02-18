@@ -39,9 +39,10 @@ library
       GHCTL.GitHub.Client.Error
       GHCTL.GitHub.Token
       GHCTL.Identified
+      GHCTL.KeyedList
+      GHCTL.LogFormatter
       GHCTL.Main
       GHCTL.Options
-      GHCTL.PathArg
       GHCTL.Prelude
       GHCTL.RepositoriesYaml
       GHCTL.Repository
@@ -50,6 +51,7 @@ library
       GHCTL.RulesetEnforcement
       GHCTL.TextBoundedEnum
       GHCTL.Variable
+      GHCTL.Yaml
   other-modules:
       Paths_ghctl
   hs-source-dirs:
@@ -69,6 +71,7 @@ library
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path
   build-depends:
       Blammo
@@ -79,13 +82,15 @@ library
     , bytestring
     , conduit
     , extra
+    , http-client
     , http-conduit
     , http-types
     , lens
+    , monad-logger-aeson
     , optparse-applicative
     , path
+    , path-io
     , relude
-    , semigroupoids
     , text
     , these
     , unliftio
@@ -113,6 +118,7 @@ executable ghctl
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
       base <5
@@ -123,6 +129,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      GHCTL.KeyedListSpec
       GHCTL.RepositoriesYamlSpec
       Paths_ghctl
   hs-source-dirs:
@@ -142,9 +149,13 @@ test-suite spec
       OverloadedStrings
       RecordWildCards
       TypeFamilies
+      QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
-      base <5
+      aeson
+    , aeson-pretty
+    , aeson-qq
+    , base <5
     , ghctl
     , hspec
   default-language: GHC2021

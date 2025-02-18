@@ -21,7 +21,6 @@ import GHCTL.Change.Pretty
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
-import GHCTL.PathArg
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
 import System.Exit (ExitCode (..))
@@ -45,11 +44,14 @@ run
   => Options
   -> m ()
 run options = do
-  logInfo $ "Loading desired state" :# ["path" .= showPathArg options.path]
-  desired <- getDesiredRepositoriesYaml options.path
+  logInfo $ "Loading desired state" :# ["directory" .= options.dir]
+  desired <- getDesiredRepositoriesYaml options.dir
 
-  let names = map (.repository.full_name) desired
-  logInfo $ "Loading current state" :# ["count" .= show @Text (length names)]
+  let
+    names = map (.repository.full_name) desired
+    count = length names
+
+  logInfo $ "Loading remote state" :# ["repositories" .= show @Text count]
   current <- getCurrentRepositoriesYaml names
 
   case options.command of
@@ -57,16 +59,16 @@ run options = do
       logInfo "Sourcing differences"
       diff <-
         runConduit
-          $ sourceChanges desired current
+          $ sourceChanges current desired
           .| iterMC prettyPrintChange
           .| lengthC @_ @Int
 
       logInfo $ ("Repository differences: " <> show diff) :# []
       when (diff > 0 && failOnDiff) $ exitWith $ ExitFailure failOnDiffExitCode
     Apply -> do
-      logInfo "Applying differences"
+      logInfo "Sourcing and applying differences"
       runConduit
-        $ sourceChanges desired current
+        $ sourceChanges current desired
         .| iterMC prettyPrintChange
         .| iterMC applyChange
         .| sinkNull

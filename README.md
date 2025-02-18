@@ -16,11 +16,9 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-p|--path FILE] COMMAND
+Usage: ghctl COMMAND
 
 Available options:
-  -p,--path FILE           Path to repositories definition file
-                           (default: repositories.yaml)
   -h,--help                Show this help text
 
 Available commands:
