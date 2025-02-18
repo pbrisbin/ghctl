@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 -- |
 --
 -- Module      : GHCTL.RepositoriesYaml
@@ -14,43 +16,32 @@ module GHCTL.RepositoriesYaml
 
 import GHCTL.Prelude
 
-import Data.Yaml qualified as Yaml
+import Data.Aeson
 import GHCTL.BranchProtection
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub qualified as GitHub
-import GHCTL.PathArg
+import GHCTL.KeyedList
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
 import GHCTL.Variable
+import GHCTL.Yaml qualified as Yaml
+import Path (relfile, (</>))
 
 data RepositoriesYaml = RepositoriesYaml
   { repository :: Repository
   , branch_protection :: Maybe BranchProtection
-  , rulesets :: [Ruleset]
-  , variables :: [Variable]
+  , rulesets :: KeyedList "name" Ruleset
+  , variables :: KeyedList "name" Variable
   }
   deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON, ToJSON)
 
 getDesiredRepositoriesYaml
-  :: (MonadIO m, MonadLogger m) => PathArg -> m [RepositoriesYaml]
-getDesiredRepositoriesYaml pathArg = do
-  bytes <- getPathArgBytes pathArg
-
-  case Yaml.decodeAllThrow bytes of
-    Left ex -> do
-      let
-        message :: Text
-        message =
-          ("Exception decoding repositories file:\n" <>)
-            $ pack
-            $ maybe (displayException ex) Yaml.prettyPrintParseException
-            $ fromException ex
-
-      logError $ message :# ["path" .= showPathArg pathArg]
-      exitFailure
-    Right yamls -> pure yamls
+  :: (MonadIO m, MonadLogger m) => Path b Dir -> m [RepositoriesYaml]
+getDesiredRepositoriesYaml dir = do
+  defaults <- Yaml.decodeOptionalFile (object []) [relfile|defaults.yaml|]
+  Yaml.decodeAllDefaults defaults $ dir </> [relfile|repositories.yaml|]
 
 getCurrentRepositoriesYaml
   :: MonadGitHub m => [RepositoryFullName] -> m [RepositoriesYaml]
@@ -67,10 +58,11 @@ getCurrent name = do
         name.name
         repository.default_branch
 
-    rulesets <- do
+    rulesets <- fmap KeyedList $ do
       rs <- GitHub.getAllRepositoryRulesets name.owner name.name
       traverse (GitHub.getRepositoryRuleset name.owner name.name . (.id)) rs
 
-    Variables {variables} <- GitHub.listRepositoryVariables name.owner name.name
+    variables <-
+      KeyedList . (.variables) <$> GitHub.listRepositoryVariables name.owner name.name
 
     pure RepositoriesYaml {repository, branch_protection, rulesets, variables}
