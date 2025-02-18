@@ -1,5 +1,3 @@
-{-# LANGUAGE QuasiQuotes #-}
-
 -- |
 --
 -- Module      : GHCTL.Options

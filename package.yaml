@@ -48,6 +48,7 @@ default-extensions:
   - OverloadedStrings
   - RecordWildCards
   - TypeFamilies
+  - QuasiQuotes # path
 
 library:
   source-dirs: src
