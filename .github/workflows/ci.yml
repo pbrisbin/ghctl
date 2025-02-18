@@ -42,7 +42,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            defaults.yaml
             repositories.yaml
           sparse-checkout-cone-mode: false
 
