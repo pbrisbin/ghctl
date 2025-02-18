@@ -15,7 +15,7 @@ module GHCTL.Options
 import GHCTL.Prelude
 
 import Options.Applicative
-import Path (reldir)
+import Path (parseRelDir, reldir)
 
 data Options = Options
   { dir :: Path Rel Dir
@@ -31,8 +31,19 @@ parseOptions = execParser $ withInfo "" optionsParser
 
 optionsParser :: Parser Options
 optionsParser =
-  Options [reldir|.|]
-    <$> subparser
+  Options
+    <$> option
+      (eitherReader $ first show . parseRelDir)
+      ( mconcat
+          [ short 'd'
+          , long "dir"
+          , help "Relative path to directory of repositories data"
+          , metavar "DIRECTORY"
+          , value [reldir|./.ghctl|]
+          , showDefaultWith toFilePath
+          ]
+      )
+    <*> subparser
       ( mconcat
           [ command "plan"
               . withInfo "show differences in desired and current state"

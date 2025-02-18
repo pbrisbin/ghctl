@@ -16,9 +16,11 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl COMMAND
+Usage: ghctl [-d|--dir DIRECTORY] COMMAND
 
 Available options:
+  -d,--dir DIRECTORY       Relative path to directory of repositories data
+                           (default: .ghctl/)
   -h,--help                Show this help text
 
 Available commands:
@@ -52,7 +54,7 @@ Available options:
 
 ## Templates
 
-[Example](./repositories.yaml)
+[Example](./.ghctl/repositories.yaml)
 
 ## License
 
