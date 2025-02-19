@@ -74,7 +74,6 @@ repositories:
       full_name: pbrisbin/ghctl
       description: CLI for maintaining GitHub settings as IaC
 
-
   - repository:
       full_name: pbrisbin/hs-shellwords
       description: Parse a string into words, like a shell would
@@ -91,7 +90,6 @@ repositories:
                   integration_id: 15368 # GitHub Actions
                 - context: commitlint
                   integration_id: 15368 # GitHub Actions
-
 
   - repository:
       full_name: pbrisbin/setup-tool-action
