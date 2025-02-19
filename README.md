@@ -16,7 +16,7 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-p|--path FILE] [--apply] [--fail-on-diff] 
+Usage: ghctl [-p|--path FILE] [--apply] [--fail-on-diff]
              [--fail-on-diff-exit-code NUMBER] [OWNER/NAME]
 
   Maintain GitHub settings
