@@ -33,11 +33,12 @@ reformatLoggedMessage _ Colors {..} logLevel LoggedMessage {..} =
           LevelError -> red $ fixedWidth levelWidth "ERROR" <> ":"
           LevelOther x -> gray $ fixedWidth levelWidth x <> ":"
       , " " <> loggedMessageText
-      , maybe "" (("\n" <>) . dim) $ do
+      , fromMaybe "" $ do
           guard $ not $ KeyMap.null metaKeyMap
-          pure $ encodePretty $ Object metaKeyMap
+          pure $ encodePretty dim $ Object metaKeyMap
       ]
  where
+  levelWidth :: Int
   levelWidth = 5
 
   metaKeyMap =
@@ -45,10 +46,10 @@ reformatLoggedMessage _ Colors {..} logLevel LoggedMessage {..} =
       <> loggedMessageThreadContext
       <> loggedMessageMeta
 
-encodePretty :: Value -> Text
-encodePretty =
-  (indent <>)
-    . T.intercalate ("\n" <> indent)
+encodePretty :: (Text -> Text) -> Value -> Text
+encodePretty dim =
+  mconcat
+    . map (\x -> "\n" <> indent <> dim x)
     . T.lines
     . decodeUtf8
     . BSL.toStrict
