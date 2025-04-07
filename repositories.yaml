@@ -116,6 +116,9 @@ repositories:
 
   - repository:
       full_name: pbrisbin/semantic-release-stack-upload
+      description: >-
+        semantic-release plugin to publish a Haskell package to Hackage using
+        stack upload
 
     rulesets:
       main:
