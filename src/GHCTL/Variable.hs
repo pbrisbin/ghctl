@@ -11,7 +11,9 @@ module GHCTL.Variable
   , Variable (..)
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding ((.=))
+
+import Autodocodec
 
 newtype Variables = Variables
   { variables :: [Variable]
@@ -24,4 +26,11 @@ data Variable = Variable
   , value :: Text
   }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving (FromJSON, ToJSON) via (Autodocodec Variable)
+
+instance HasCodec Variable where
+  codec =
+    object "Variable"
+      $ Variable
+      <$> (requiredField' "name" .= (.name))
+      <*> (requiredField' "value" .= (.value))

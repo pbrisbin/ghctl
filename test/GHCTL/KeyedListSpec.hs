@@ -10,9 +10,9 @@ module GHCTL.KeyedListSpec
   ( spec
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding ((.=))
 
-import Data.Aeson
+import Autodocodec
 import Data.Aeson.Encode.Pretty
 import Data.Aeson.QQ
 import GHCTL.KeyedList
@@ -23,13 +23,24 @@ data Person = Person
   , age :: Int
   }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+
+instance HasCodec Person where
+  codec =
+    object "Person"
+      $ Person
+      <$> (requiredField' "name" .= (.name))
+      <*> (requiredField' "age" .= (.age))
 
 newtype Store = Store
   { people :: KeyedList "name" Person
   }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+
+instance HasCodec Store where
+  codec =
+    object "Store"
+      $ Store
+      <$> (requiredField' "people" .= (.people))
 
 spec :: Spec
 spec = do
@@ -55,7 +66,8 @@ spec = do
             }
           |]
 
-      encodePretty store `shouldBe` encodePretty reference
+      encodePretty (toJSONViaCodec store)
+        `shouldBe` encodePretty (toJSONViaCodec reference)
 
   describe "FromJSON" $ do
     it "parses an array as-is" $ do
@@ -79,7 +91,8 @@ spec = do
                   ]
             }
 
-      eitherDecode (encode reference) `shouldBe` Right expected
+      eitherDecodeJSONViaCodec (encodeJSONViaCodec reference)
+        `shouldBe` Right expected
 
     it "parses objects keyed correctly" $ do
       let
@@ -103,4 +116,5 @@ spec = do
                   ]
             }
 
-      eitherDecode (encode reference) `shouldBe` Right expected
+      eitherDecodeJSONViaCodec (encodeJSONViaCodec reference)
+        `shouldBe` Right expected

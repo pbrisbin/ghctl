@@ -1,0 +1,932 @@
+{
+  "$comment": "RepositoryYaml",
+  "properties": {
+    "branch_protection": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$comment": "BranchProtection",
+          "properties": {
+            "allow_deletions": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "allow_force_pushes": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "allow_fork_syncing": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "block_creations": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "enforce_admins": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "lock_branch": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "required_conversation_resolution": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "required_linear_history": {
+              "anyOf": [
+                {
+                  "$comment": "BoolEnabled",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "required_pull_request_reviews": {
+              "$comment": "PullRequestReviews",
+              "properties": {
+                "bypass_pull_request_allowances": {
+                  "$comment": "UsersTeamsApps",
+                  "properties": {
+                    "apps": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "teams": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "users": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "apps",
+                    "teams",
+                    "users"
+                  ],
+                  "type": "object"
+                },
+                "dismiss_stale_reviews": {
+                  "type": "boolean"
+                },
+                "dismissal_restrictions": {
+                  "$comment": "UsersTeamsApps",
+                  "properties": {
+                    "apps": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "teams": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "users": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "apps",
+                    "teams",
+                    "users"
+                  ],
+                  "type": "object"
+                },
+                "require_code_owner_reviews": {
+                  "type": "boolean"
+                },
+                "require_last_push_approval": {
+                  "type": "boolean"
+                },
+                "required_approving_review_count": {
+                  "maximum": 9223372036854775807,
+                  "minimum": -9223372036854775808,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "required_status_checks": {
+              "$comment": "StatusChecks",
+              "properties": {
+                "checks": {
+                  "items": {
+                    "$comment": "StatusCheck",
+                    "properties": {
+                      "app_id": {
+                        "maximum": 9223372036854775807,
+                        "minimum": -9223372036854775808,
+                        "type": "integer"
+                      },
+                      "context": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "context"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "contexts": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "strict": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "checks",
+                "contexts",
+                "strict"
+              ],
+              "type": "object"
+            },
+            "restrictions": {
+              "$comment": "UsersTeamsApps",
+              "properties": {
+                "apps": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "teams": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "users": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "apps",
+                "teams",
+                "users"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "allow_fork_syncing",
+            "lock_branch",
+            "required_conversation_resolution",
+            "block_creations",
+            "allow_deletions",
+            "allow_force_pushes",
+            "required_linear_history",
+            "enforce_admins"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "repository": {
+      "$comment": "Repository",
+      "properties": {
+        "allow_auto_merge": {
+          "type": "boolean"
+        },
+        "allow_merge_commit": {
+          "type": "boolean"
+        },
+        "allow_rebase_merge": {
+          "type": "boolean"
+        },
+        "allow_squash_merge": {
+          "type": "boolean"
+        },
+        "allow_update_branch": {
+          "type": "boolean"
+        },
+        "default_branch": {
+          "type": "string"
+        },
+        "delete_branch_on_merge": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "full_name": {
+          "$comment": "owner/name",
+          "type": "string"
+        },
+        "has_issues": {
+          "type": "boolean"
+        },
+        "has_projects": {
+          "type": "boolean"
+        },
+        "has_wiki": {
+          "type": "boolean"
+        },
+        "private": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "allow_update_branch",
+        "delete_branch_on_merge",
+        "allow_auto_merge",
+        "allow_rebase_merge",
+        "allow_merge_commit",
+        "allow_squash_merge",
+        "default_branch",
+        "has_wiki",
+        "has_projects",
+        "has_issues",
+        "private",
+        "full_name"
+      ],
+      "type": "object"
+    },
+    "rulesets": {
+      "anyOf": [
+        {
+          "items": {
+            "$comment": "Ruleset",
+            "properties": {
+              "bypass_actors": {
+                "items": {
+                  "$comment": "RulesetBypassActor",
+                  "properties": {
+                    "actor_id": {
+                      "maximum": 9223372036854775807,
+                      "minimum": -9223372036854775808,
+                      "type": "integer"
+                    },
+                    "actor_type": {
+                      "oneOf": [
+                        {
+                          "const": "OrganizationAdmin"
+                        },
+                        {
+                          "const": "RepositoryAdmin"
+                        },
+                        {
+                          "const": "RepositoryRole"
+                        },
+                        {
+                          "const": "Integration"
+                        }
+                      ]
+                    },
+                    "bypass_mode": {
+                      "oneOf": [
+                        {
+                          "const": "always"
+                        },
+                        {
+                          "const": "pull_request"
+                        },
+                        {
+                          "const": "pull_requests"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "bypass_mode",
+                    "actor_type"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "conditions": {
+                "$comment": "RulesetCondition",
+                "properties": {
+                  "ref_name": {
+                    "$comment": "IncludeExclude",
+                    "properties": {
+                      "exclude": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "include": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "ref_name"
+                ],
+                "type": "object"
+              },
+              "enforcement": {
+                "oneOf": [
+                  {
+                    "const": "disabled"
+                  },
+                  {
+                    "const": "active"
+                  },
+                  {
+                    "const": "evaluate"
+                  }
+                ]
+              },
+              "name": {
+                "type": "string"
+              },
+              "rules": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "$comment": "RulesetRule",
+                      "oneOf": [
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "workflows"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "properties": {
+                                "type": {
+                                  "const": "required_linear_history"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "type": "object"
+                            }
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "branch_name_pattern"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "properties": {
+                                "type": {
+                                  "const": "required_signatures"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "type": "object"
+                            }
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "merge_queue"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "file_extension_restriction"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "required_deployments"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "committer_email_pattern"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "commit_message_pattern"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "tag_name_pattern"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "properties": {
+                                "type": {
+                                  "const": "non_fast_forward"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "type": "object"
+                            }
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "properties": {
+                                "type": {
+                                  "const": "deletion"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "type": "object"
+                            }
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "update"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "code_scanning"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "file_path_restrictions"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "commit_author_email_pattern"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "max_file_path_length"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {},
+                            "type": {
+                              "const": "max_file_size"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "allOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "properties": {
+                                "type": {
+                                  "const": "creation"
+                                }
+                              },
+                              "required": [
+                                "type"
+                              ],
+                              "type": "object"
+                            }
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {
+                              "$comment": "RulesetRuleRequiredStatusChecksParameters",
+                              "properties": {
+                                "required_status_checks": {
+                                  "items": {
+                                    "$comment": "RequiredStatusCheck",
+                                    "properties": {
+                                      "context": {
+                                        "type": "string"
+                                      },
+                                      "integration_id": {
+                                        "maximum": 9223372036854775807,
+                                        "minimum": -9223372036854775808,
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "required": [
+                                      "context"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "strict_required_status_checks_policy": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "strict_required_status_checks_policy",
+                                "required_status_checks"
+                              ],
+                              "type": "object"
+                            },
+                            "type": {
+                              "const": "required_status_checks"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "properties": {
+                            "parameters": {
+                              "$comment": "RulesetRulePullRequestParameters",
+                              "properties": {
+                                "allowed_merge_methods": {
+                                  "items": {
+                                    "oneOf": [
+                                      {
+                                        "const": "merge"
+                                      },
+                                      {
+                                        "const": "squash"
+                                      },
+                                      {
+                                        "const": "rebase"
+                                      }
+                                    ]
+                                  },
+                                  "type": "array"
+                                },
+                                "dismiss_stale_reviews_on_push": {
+                                  "type": "boolean"
+                                },
+                                "require_code_owner_review": {
+                                  "type": "boolean"
+                                },
+                                "require_last_push_approval": {
+                                  "type": "boolean"
+                                },
+                                "required_approving_review_count": {
+                                  "maximum": 9223372036854775807,
+                                  "minimum": -9223372036854775808,
+                                  "type": "integer"
+                                },
+                                "required_review_thread_resolution": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "required_review_thread_resolution",
+                                "required_approving_review_count",
+                                "require_last_push_approval",
+                                "require_code_owner_review",
+                                "dismiss_stale_reviews_on_push",
+                                "allowed_merge_methods"
+                              ],
+                              "type": "object"
+                            },
+                            "type": {
+                              "const": "pull_request"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "parameters"
+                          ],
+                          "type": "object"
+                        }
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "$comment": "An object of objects keyed by the value to use for their type property"
+                  }
+                ]
+              },
+              "target": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rules",
+              "bypass_actors",
+              "enforcement",
+              "target",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "$comment": "An object of objects keyed by the value to use for their name property"
+        }
+      ]
+    },
+    "variables": {
+      "anyOf": [
+        {
+          "items": {
+            "$comment": "Variable",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "$comment": "An object of objects keyed by the value to use for their name property"
+        }
+      ]
+    }
+  },
+  "required": [
+    "variables",
+    "rulesets",
+    "repository"
+  ],
+  "type": "object"
+}

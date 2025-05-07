@@ -1,6 +1,6 @@
 cabal-version: 1.18
 
--- This file has been generated from package.yaml by hpack version 0.37.0.
+-- This file has been generated from package.yaml by hpack version 0.38.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -49,6 +49,7 @@ library
       GHCTL.RepositoryFullName
       GHCTL.Ruleset
       GHCTL.RulesetEnforcement
+      GHCTL.SchemaGen.Main
       GHCTL.TextBoundedEnum
       GHCTL.Variable
   other-modules:
@@ -77,14 +78,19 @@ library
     , Diff
     , aeson
     , aeson-pretty
+    , autodocodec
+    , autodocodec-schema
+    , autodocodec-yaml
     , base <5
     , bytestring
     , conduit
-    , extra
+    , exceptions
     , http-client
     , http-conduit
     , http-types
     , lens
+    , microlens
+    , microlens-aeson
     , monad-logger-aeson
     , optparse-applicative
     , path
@@ -93,6 +99,7 @@ library
     , text
     , these
     , unliftio
+    , vector
     , yaml
   default-language: GHC2021
 
@@ -102,6 +109,34 @@ executable ghctl
       Paths_ghctl
   hs-source-dirs:
       app
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      GADTs
+      LambdaCase
+      NoFieldSelectors
+      NoImplicitPrelude
+      NoMonomorphismRestriction
+      OverloadedRecordDot
+      OverloadedStrings
+      RecordWildCards
+      TypeFamilies
+      QuasiQuotes
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
+  build-depends:
+      base <5
+    , ghctl
+  default-language: GHC2021
+
+executable ghctl-schema-gen
+  main-is: Main.hs
+  other-modules:
+      Paths_ghctl
+  hs-source-dirs:
+      schema-gen
   default-extensions:
       DataKinds
       DeriveAnyClass
@@ -151,9 +186,9 @@ test-suite spec
       QuasiQuotes
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -optP-Wno-nonportable-include-path -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
-      aeson
-    , aeson-pretty
+      aeson-pretty
     , aeson-qq
+    , autodocodec
     , base <5
     , ghctl
     , hspec

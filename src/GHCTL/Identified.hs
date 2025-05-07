@@ -10,11 +10,20 @@ module GHCTL.Identified
   ( Identified (..)
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding ((.=))
+
+import Autodocodec
 
 data Identified = Identified
   { id :: Int
   , name :: Text
   }
   deriving stock (Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving (FromJSON, ToJSON) via (Autodocodec Identified)
+
+instance HasCodec Identified where
+  codec =
+    object "Identified"
+      $ Identified
+      <$> (requiredField' "id" .= (.id))
+      <*> (requiredField' "name" .= (.name))

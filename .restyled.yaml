@@ -1,3 +1,6 @@
+also_exclude:
+  - ./**/*.schema.json
+
 restylers:
   - "!stylish-haskell"
   - "fourmolu"

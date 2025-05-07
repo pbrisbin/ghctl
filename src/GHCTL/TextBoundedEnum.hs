@@ -12,6 +12,7 @@ module GHCTL.TextBoundedEnum
 
 import GHCTL.Prelude
 
+import Autodocodec
 import Data.Aeson (withText)
 import Data.Aeson.Types (ToJSONKey (..), toJSONKeyText)
 
@@ -23,7 +24,7 @@ fromTextBoundedEnum t = maybe (Left err) Right $ inverseMap toText t
 newtype TextBoundedEnum a = TextBoundedEnum
   { unwrap :: a
   }
-  deriving newtype (Bounded, Enum, ToText)
+  deriving newtype (Bounded, Enum, Eq, ToText)
 
 instance (Bounded a, Enum a, ToText a) => FromJSON (TextBoundedEnum a) where
   parseJSON = withText "" $ either fail pure . fromTextBoundedEnum
@@ -34,3 +35,6 @@ instance (Bounded a, Enum a, ToText a) => ToJSON (TextBoundedEnum a) where
 
 instance (Bounded a, Enum a, ToText a) => ToJSONKey (TextBoundedEnum a) where
   toJSONKey = toJSONKeyText toText
+
+instance (Bounded a, Enum a, Eq a, ToText a) => HasCodec (TextBoundedEnum a) where
+  codec = boundedEnumCodec toText

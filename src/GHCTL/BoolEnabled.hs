@@ -10,19 +10,35 @@ module GHCTL.BoolEnabled
   ( BoolEnabled (..)
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding ((.=))
 
-import Data.Aeson (Value (..), (.:))
-import Data.Aeson.Types (typeMismatch)
+import Autodocodec
 
+-- | A type representing an @enabled@ state
+--
+-- Canonically, this is an object with an @enabled@ key,
+--
+-- @
+-- {
+--   enabled: true|false
+-- }
+-- @
+--
+-- but we support parsing bare 'Bool' values as well.
+--
+-- @
+-- true|false
+-- @
 newtype BoolEnabled = BoolEnabled
   { enabled :: Bool
   }
   deriving stock (Eq, Generic, Show)
-  deriving newtype (ToJSON)
+  deriving (FromJSON, ToJSON) via (Autodocodec BoolEnabled)
 
-instance FromJSON BoolEnabled where
-  parseJSON = \case
-    Object hm -> BoolEnabled <$> hm .: "enabled"
-    Bool b -> pure $ BoolEnabled b
-    v -> typeMismatch "Object with enabled key or Bool" v
+instance HasCodec BoolEnabled where
+  codec =
+    dimapCodec BoolEnabled (.enabled)
+      $ parseAlternative enabledObjectCodec boolCodec
+
+enabledObjectCodec :: JSONCodec Bool
+enabledObjectCodec = object "BoolEnabled" $ requiredField' "enabled" .= id

@@ -32,9 +32,21 @@ Available options:
   -h,--help                Show this help text
 ```
 
-## Templates
+## `repositories.yaml` Schema
 
-[Example](./repositories.yaml)
+The `repositories.yaml` file must contain a `repositories` key, and optionally a
+`defaults` key.
+
+These are treated as schema-less values for the purpose of applying `defaults`
+to each element in the `repositories` list. Defaults are applied as a recursive
+merge, biased towards the `repositories` value.
+
+**After defaults are applied**, each value must satisfy the [`Repository`
+schema](./repository.schema.json).
+
+## Examples
+
+I've started documenting my own repositories [here](./repositories.yaml).
 
 ## License
 
