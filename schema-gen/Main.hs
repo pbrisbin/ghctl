@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -F -pgmF hspec-discover -Wno-missing-export-lists #-}
-
 -- |
 --
 -- Module      : Main
@@ -8,3 +6,8 @@
 -- Maintainer  : pbrisbin@gmail.com
 -- Stability   : experimental
 -- Portability : POSIX
+module Main
+  ( module GHCTL.SchemaGen.Main
+  ) where
+
+import GHCTL.SchemaGen.Main

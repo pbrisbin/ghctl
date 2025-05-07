@@ -12,10 +12,15 @@ module GHCTL.RepositoriesYaml
   , getCurrentRepositoryYaml
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding (die, (.=))
 
-import Data.Aeson
+import Autodocodec
+import Autodocodec.Yaml (eitherDecodeYamlViaCodec)
+import Blammo.Logging qualified as L
+import Blammo.Logging.ThreadContext (MonadMask, withThreadContext)
+import Data.Aeson (Value (..))
 import Data.Aeson.KeyMap qualified as KeyMap
+import Data.Aeson.Types qualified as Aeson
 import Data.Yaml qualified as Yaml
 import GHCTL.BranchProtection
 import GHCTL.GitHub (MonadGitHub)
@@ -26,6 +31,8 @@ import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
 import GHCTL.Variable
+import Lens.Micro (to, (^?))
+import Lens.Micro.Aeson (key, _Array)
 
 data RepositoryYaml = RepositoryYaml
   { repository :: Repository
@@ -34,23 +41,36 @@ data RepositoryYaml = RepositoryYaml
   , variables :: KeyedList "name" Variable
   }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving (FromJSON, ToJSON) via (Autodocodec RepositoryYaml)
 
-data RepositoriesYaml = RepositoriesYaml
-  { defaults :: Maybe Value
-  , repositories :: [Value]
-  }
-  deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+instance HasCodec RepositoryYaml where
+  codec =
+    object "RepositoryYaml"
+      $ RepositoryYaml
+      <$> (requiredField' "repository" .= (.repository))
+      <*> (optionalFieldOrNull' "branch_protection" .= (.branch_protection))
+      <*> (requiredField' "rulesets" .= (.rulesets))
+      <*> (requiredField' "variables" .= (.variables))
 
 getDesiredRepositoriesYaml
-  :: (MonadIO m, MonadLogger m) => PathArg -> m [RepositoryYaml]
+  :: (MonadIO m, MonadLogger m, MonadMask m) => PathArg -> m [RepositoryYaml]
 getDesiredRepositoriesYaml pathArg = do
-  bytes <- getPathArgBytes pathArg
-  RepositoriesYaml {defaults, repositories} <- decodeYamlOrDie path bytes
-  traverse (fromJSONOrDie path . maybe id overwriteValues defaults) repositories
+  withThreadContext ["path" L..= showPathArg pathArg] $ do
+    bytes <- getPathArgBytes pathArg
+    value <- decodeYamlOrDie @_ @Value bytes
+    (mDefaults, repositories) <- decodeTopLevel value
+    traverse (fromJSONOrDie . maybe id overwriteValues mDefaults) repositories
+
+decodeTopLevel
+  :: (MonadIO m, MonadLogger m) => Value -> m (Maybe Value, [Value])
+decodeTopLevel v = do
+  maybe
+    (invalidConfig "repositories key not present or not array")
+    (pure . (mDefaults,))
+    mRepositories
  where
-  path = showPathArg pathArg
+  mDefaults = v ^? key "defaults"
+  mRepositories = v ^? key "repositories" . _Array . to toList
 
 getCurrentRepositoryYaml
   :: MonadGitHub m => RepositoryFullName -> m (Maybe RepositoryYaml)
@@ -75,38 +95,30 @@ getCurrentRepositoryYaml name = do
 
 decodeYamlOrDie
   :: forall m a
-   . (FromJSON a, MonadIO m, MonadLogger m)
-  => String
-  -- ^ For error message
-  -> ByteString
+   . (HasCodec a, MonadIO m, MonadLogger m)
+  => ByteString
   -> m a
-decodeYamlOrDie path bytes =
-  case Yaml.decodeEither' bytes of
-    Left ex -> do
-      let
-        message :: Text
-        message =
-          "Exception decoding repositories file:\n"
-            <> pack (Yaml.prettyPrintParseException ex)
-      logError $ message :# ["path" .= path]
-      exitFailure
+decodeYamlOrDie bytes =
+  case eitherDecodeYamlViaCodec bytes of
+    Left ex -> invalidConfig $ pack (Yaml.prettyPrintParseException ex) :# []
     Right a -> pure a
 
 fromJSONOrDie
   :: forall m a
-   . (FromJSON a, MonadIO m, MonadLogger m)
-  => String
-  -- ^ For error message
-  -> Value
+   . (HasCodec a, MonadIO m, MonadLogger m)
+  => Value
   -> m a
-fromJSONOrDie path value =
-  case fromJSON value of
-    Error err -> do
-      logError $ pack err :# ["path" .= path, "input" .= value]
-      exitFailure
-    Success a -> pure a
+fromJSONOrDie value =
+  case Aeson.parseEither parseJSONViaCodec value of
+    Left err -> invalidConfig $ pack err :# ["input" L..= value]
+    Right a -> pure a
 
 overwriteValues :: Value -> Value -> Value
 overwriteValues = curry $ \case
   (Object a, Object b) -> Object $ KeyMap.unionWith overwriteValues a b
   (_, v) -> v
+
+invalidConfig :: (MonadIO m, MonadLogger m) => Message -> m a
+invalidConfig (msg :# attrs) = do
+  logError $ ("Invalid repositories file:\n" <> msg) :# attrs
+  exitFailure

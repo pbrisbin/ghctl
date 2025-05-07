@@ -13,7 +13,7 @@ module GHCTL.RepositoryFullName
 
 import GHCTL.Prelude
 
-import Data.Aeson (withText)
+import Autodocodec
 import Data.Text qualified as T
 
 data RepositoryFullName = RepositoryFullName
@@ -21,19 +21,13 @@ data RepositoryFullName = RepositoryFullName
   , name :: Text
   }
   deriving stock (Eq, Ord, Show)
+  deriving (FromJSON, ToJSON) via (Autodocodec RepositoryFullName)
 
 instance ToText RepositoryFullName where
   toText repo = repo.owner <> "/" <> repo.name
 
-instance FromJSON RepositoryFullName where
-  parseJSON =
-    withText "RepositoryFullName"
-      $ either fail pure
-      . repositoryFullNameFromText
-
-instance ToJSON RepositoryFullName where
-  toJSON = toJSON . toText
-  toEncoding = toEncoding . toText
+instance HasCodec RepositoryFullName where
+  codec = bimapCodec repositoryFullNameFromText toText textCodec <?> "owner/name"
 
 instance IsString RepositoryFullName where
   fromString = either (error . pack) id . repositoryFullNameFromText . pack

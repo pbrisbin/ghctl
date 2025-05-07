@@ -13,6 +13,7 @@ module GHCTL.Main
 import GHCTL.Prelude
 
 import Blammo.Logging.Logger (HasLogger)
+import Blammo.Logging.ThreadContext (MonadMask)
 import Conduit
 import GHCTL.App
 import GHCTL.Change
@@ -38,6 +39,7 @@ run
   :: ( HasLogger env
      , MonadGitHub m
      , MonadLogger m
+     , MonadMask m
      , MonadReader env m
      , MonadUnliftIO m
      )

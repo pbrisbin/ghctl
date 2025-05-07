@@ -10,8 +10,9 @@ module GHCTL.Repository
   ( Repository (..)
   ) where
 
-import GHCTL.Prelude
+import GHCTL.Prelude hiding ((.=))
 
+import Autodocodec
 import GHCTL.RepositoryFullName
 
 data Repository = Repository
@@ -30,4 +31,22 @@ data Repository = Repository
   , allow_update_branch :: Bool
   }
   deriving stock (Eq, Generic, Show)
-  deriving anyclass (FromJSON, ToJSON)
+  deriving (FromJSON, ToJSON) via (Autodocodec Repository)
+
+instance HasCodec Repository where
+  codec =
+    object "Repository"
+      $ Repository
+      <$> (requiredField' "full_name" .= (.full_name))
+      <*> (optionalField' "description" .= (.description))
+      <*> (requiredField' "private" .= (.private))
+      <*> (requiredField' "has_issues" .= (.has_issues))
+      <*> (requiredField' "has_projects" .= (.has_projects))
+      <*> (requiredField' "has_wiki" .= (.has_wiki))
+      <*> (requiredField' "default_branch" .= (.default_branch))
+      <*> (requiredField' "allow_squash_merge" .= (.allow_squash_merge))
+      <*> (requiredField' "allow_merge_commit" .= (.allow_merge_commit))
+      <*> (requiredField' "allow_rebase_merge" .= (.allow_rebase_merge))
+      <*> (requiredField' "allow_auto_merge" .= (.allow_auto_merge))
+      <*> (requiredField' "delete_branch_on_merge" .= (.delete_branch_on_merge))
+      <*> (requiredField' "allow_update_branch" .= (.allow_update_branch))

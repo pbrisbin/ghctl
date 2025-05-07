@@ -16,6 +16,7 @@ import GHCTL.Prelude
 import Blammo.Logging.Logger
 import Blammo.Logging.Simple
 import Control.Lens
+import Control.Monad.Catch (MonadCatch, MonadThrow)
 import GHCTL.GitHub (MonadGitHub (..))
 import GHCTL.GitHub.Actual
 import GHCTL.GitHub.Token
@@ -39,8 +40,11 @@ newtype AppM a = AppM
     ( Applicative
     , Functor
     , Monad
+    , MonadCatch
     , MonadIO
+    , MonadMask
     , MonadReader App
+    , MonadThrow
     , MonadUnliftIO
     )
   deriving (MonadLogger) via WithLogger App IO

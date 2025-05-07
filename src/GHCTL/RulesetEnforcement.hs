@@ -12,6 +12,7 @@ module GHCTL.RulesetEnforcement
 
 import GHCTL.Prelude
 
+import Autodocodec
 import GHCTL.TextBoundedEnum
 
 data RulesetEnforcement
@@ -19,7 +20,7 @@ data RulesetEnforcement
   | RulesetEnforcementActive
   | RulesetEnforcementEvaluate
   deriving stock (Bounded, Enum, Eq, Generic, Show)
-  deriving (FromJSON, ToJSON) via (TextBoundedEnum RulesetEnforcement)
+  deriving (FromJSON, HasCodec, ToJSON) via (TextBoundedEnum RulesetEnforcement)
 
 instance ToText RulesetEnforcement where
   toText = \case
