@@ -15,6 +15,7 @@ module GHCTL.Options
 
 import GHCTL.Prelude
 
+import GHCTL.Change.Apply (Delete, deleteOption)
 import GHCTL.PathArg
 import GHCTL.RepositoryFullName
 import Options.Applicative
@@ -23,6 +24,7 @@ import Path (relfile)
 data Options = Options
   { path :: PathArg
   , apply :: Bool
+  , delete :: Delete
   , failOnDiff :: Bool
   , failOnDiffExitCode :: Int
   , repositories :: Maybe (NonEmpty RepositoryFullName)
@@ -51,6 +53,7 @@ optionsParser =
           , help "Apply changes to make current state look like desired"
           ]
       )
+    <*> deleteOption
     <*> switch
       ( mconcat
           [ long "fail-on-diff"

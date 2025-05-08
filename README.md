@@ -16,7 +16,7 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-p|--path FILE] [--apply] [--fail-on-diff]
+Usage: ghctl [-p|--path FILE] [--apply] [--no-skip-delete] [--fail-on-diff] 
              [--fail-on-diff-exit-code NUMBER] [OWNER/NAME]
 
   Maintain GitHub settings
@@ -25,6 +25,7 @@ Available options:
   -p,--path FILE           Path to repositories definition file
                            (default: repositories.yaml)
   --apply                  Apply changes to make current state look like desired
+  --no-skip-delete         Don't skip changes that represent deletes
   --fail-on-diff           Fail if there are un-applied differences
   --fail-on-diff-exit-code NUMBER
                            Exit code for --fail-on-diff (default: 228)
