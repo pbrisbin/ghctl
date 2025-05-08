@@ -7,7 +7,9 @@
 -- Stability   : experimental
 -- Portability : POSIX
 module GHCTL.Change.Apply
-  ( applyChange
+  ( Delete
+  , deleteOption
+  , applyChange
   ) where
 
 import GHCTL.Prelude
@@ -16,17 +18,37 @@ import GHCTL.CRUD (HasCRUD)
 import GHCTL.CRUD qualified as CRUD
 import GHCTL.Change
 import GHCTL.GitHub (MonadGitHub)
+import Options.Applicative (Parser, flag, help, long)
 
-applyChange :: (MonadGitHub m, MonadLogger m) => Change -> m ()
-applyChange = \case
-  ChangeRepository attr -> applyAttributeChange attr
-  ChangeBranchProtection attr -> applyAttributeChange attr
-  ChangeRuleset attr -> applyAttributeChange attr
-  ChangeVariable attr -> applyAttributeChange attr
+data Delete = Delete | Don'tDelete
 
-applyAttributeChange :: HasCRUD a m => Attribute a -> m ()
-applyAttributeChange Attribute {repository, desiredCurrent} =
+deleteOption :: Parser Delete
+deleteOption =
+  flag Don'tDelete Delete
+    $ mconcat
+      [ long "no-skip-delete"
+      , help "Don't skip changes that represent deletes"
+      ]
+
+applyChange :: (MonadGitHub m, MonadLogger m) => Delete -> Change -> m ()
+applyChange d = \case
+  ChangeRepository attr -> applyAttributeChange d attr
+  ChangeBranchProtection attr -> applyAttributeChange d attr
+  ChangeRuleset attr -> applyAttributeChange d attr
+  ChangeVariable attr -> applyAttributeChange d attr
+
+applyAttributeChange
+  :: (HasCRUD a m, MonadLogger m) => Delete -> Attribute a -> m ()
+applyAttributeChange d Attribute {repository, desiredCurrent} =
   case desiredCurrent of
-    This a -> CRUD.create repository a
-    That b -> CRUD.delete repository b
-    These a b -> CRUD.update repository a b
+    This a -> do
+      logInfo "Creating resource"
+      CRUD.create repository a
+    That b -> case d of
+      Delete -> do
+        logInfo "Deleting resource"
+        CRUD.delete repository b
+      Don'tDelete -> logWarn "Not deleting without --no-skip-delete"
+    These a b -> do
+      logInfo "Updating resource"
+      CRUD.update repository a b

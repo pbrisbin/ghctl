@@ -53,7 +53,7 @@ run options = do
       $ yieldMany desired
       .| filterC include
       .| sourceChanges
-      .| iterMC apply
+      .| iterMC (when options.apply . applyChange options.delete)
       .| sinkList
 
   logInfo
@@ -72,8 +72,3 @@ run options = do
       (const True)
       (\names -> (`elem` names) . (.repository.full_name))
       options.repositories
-
-  apply change =
-    when options.apply $ do
-      logInfo "Applying change"
-      applyChange change
