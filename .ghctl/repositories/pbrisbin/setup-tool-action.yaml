@@ -1,0 +1,21 @@
+repository:
+  description: >-
+    Generic action for installation of any tool that offers pre-compiled
+    binaries for download
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: "integration (macos-latest)"
+              integration_id: 15368 # GitHub Actions
+            - context: "integration (ubuntu-latest)"
+              integration_id: 15368 # GitHub Actions
+            - context: "integration (windows-latest)"
+              integration_id: 15368 # GitHub Actions
+            - context: test
+              integration_id: 15368 # GitHub Actions
+            - context: commitlint
+              integration_id: 15368 # GitHub Actions

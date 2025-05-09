@@ -1,0 +1,13 @@
+repository:
+  description: >-
+    semantic-release plugin to publish a Haskell package to Hackage using
+    stack upload
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: "build"
+              integration_id: 15368 # GitHub Actions

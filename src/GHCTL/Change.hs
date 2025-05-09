@@ -18,7 +18,6 @@ import Blammo.Logging.Colors (Colors (..), getColorsLogger)
 import Blammo.Logging.Logger (HasLogger)
 import Data.Algorithm.Diff (Diff)
 import Data.Algorithm.Diff qualified as Diff
-import Data.These.Combinators (bimapThese)
 import GHCTL.BranchProtection
 import GHCTL.Conduit
 import GHCTL.Diff
@@ -26,6 +25,7 @@ import GHCTL.GitHub (MonadGitHub)
 import GHCTL.KeyedList
 import GHCTL.RepositoriesYaml
 import GHCTL.Repository
+import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
 import GHCTL.Variable
 
@@ -36,7 +36,7 @@ data Change
   | ChangeVariable (Attribute Variable)
 
 data Attribute a = Attribute
-  { repository :: Repository
+  { repository :: RepositoryFullName
   , desiredCurrent :: These a a
   }
   deriving stock (Generic)
@@ -44,58 +44,44 @@ data Attribute a = Attribute
 
 sourceChanges
   :: (HasLogger env, MonadGitHub m, MonadLogger m, MonadReader env m)
-  => ConduitT RepositoryYaml Change m ()
-sourceChanges = awaitForever $ \desired -> do
-  let name = desired.repository.full_name
-  logDebug $ "Loading remote state" :# ["repository" .= name]
-  current <- lift $ getCurrentRepositoryYaml name
-
+  => RepositoryFullName
+  -> ConduitT (These (Maybe RepositoryYaml) (Maybe RepositoryYaml)) Change m ()
+sourceChanges name = do
   colors <- getColorsLogger
 
-  yield (These (Just desired) current)
-    .| catTheseMaybesC
+  catTheseMaybesC
     .| filterTheseC (/=)
-    .| with
-      getRepository
-      ( \repository ->
-          sequenceSinks_
-            [ bothTheseC (.repository)
-                .| filterTheseC (/=)
-                .| iterMC (logChange colors repository Nothing)
-                .| mapC (ChangeRepository . Attribute repository)
-            , bothTheseC (.branch_protection)
-                .| catTheseMaybesC
-                .| filterTheseC (/=)
-                .| iterMC (logChange colors repository $ Just "branch-protection")
-                .| mapC (ChangeBranchProtection . Attribute repository)
-            , bothTheseC (.rulesets.unwrap)
-                .| pairTheseOnC (.name)
-                .| filterTheseC (/=)
-                .| iterMC (logChange colors repository $ Just "ruleset")
-                .| mapC (ChangeRuleset . Attribute repository)
-            , bothTheseC (.variables.unwrap)
-                .| pairTheseOnC (.name)
-                .| filterTheseC (/=)
-                .| iterMC (logChange colors repository $ Just "variable")
-                .| mapC (ChangeVariable . Attribute repository)
-            ]
-      )
-
-getRepository :: These RepositoryYaml RepositoryYaml -> Repository
-getRepository = mergeThese const . bimapThese (.repository) (.repository)
-
-with :: Monad m => (i -> a) -> (a -> ConduitT i o m ()) -> ConduitT i o m ()
-with f g = awaitForever $ \i -> yield i .| g (f i)
+    .| sequenceSinks_
+      [ bothTheseC (.repository)
+          .| filterTheseC (/=)
+          .| iterMC (logChange colors name Nothing)
+          .| mapC (ChangeRepository . Attribute name)
+      , bothTheseC (.branch_protection)
+          .| catTheseMaybesC
+          .| filterTheseC (/=)
+          .| iterMC (logChange colors name $ Just "branch-protection")
+          .| mapC (ChangeBranchProtection . Attribute name)
+      , bothTheseC (.rulesets.unwrap)
+          .| pairTheseOnC (.name)
+          .| filterTheseC (/=)
+          .| iterMC (logChange colors name $ Just "ruleset")
+          .| mapC (ChangeRuleset . Attribute name)
+      , bothTheseC (.variables.unwrap)
+          .| pairTheseOnC (.name)
+          .| filterTheseC (/=)
+          .| iterMC (logChange colors name $ Just "variable")
+          .| mapC (ChangeVariable . Attribute name)
+      ]
 
 logChange
   :: forall m a
    . (MonadLogger m, ToJSON a)
   => Colors
-  -> Repository
+  -> RepositoryFullName
   -> Maybe Text
   -> These a a
   -> m ()
-logChange colors@Colors {..} repository mTarget = \case
+logChange colors@Colors {..} name mTarget = \case
   This desired -> logInfo $ "Create " <> suffix :# ["create" .= desired]
   That current -> logInfo $ "Delete " <> suffix :# ["delete" .= current]
   These desired current -> do
@@ -104,7 +90,7 @@ logChange colors@Colors {..} repository mTarget = \case
       $ renderDiffLines colors
       $ jsonDiff current desired
  where
-  suffix = magenta (toText repository.full_name) <> maybe "" (dim . ("#" <>)) mTarget
+  suffix = magenta (toText name) <> maybe "" (dim . ("#" <>)) mTarget
 
 renderDiffLines :: Colors -> [Diff Text] -> [Text]
 renderDiffLines colors@Colors {..} diff =

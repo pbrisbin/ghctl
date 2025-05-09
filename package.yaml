@@ -67,13 +67,11 @@ library:
     - http-conduit
     - http-types
     - lens
-    - microlens
-    - microlens-aeson
     - monad-logger-aeson
     - optparse-applicative
     - path
+    - path-io
     - relude
-    - semigroupoids
     - text
     - these
     - unliftio

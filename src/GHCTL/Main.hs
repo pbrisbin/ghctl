@@ -13,17 +13,17 @@ module GHCTL.Main
 import GHCTL.Prelude
 
 import Blammo.Logging.Logger (HasLogger)
-import Blammo.Logging.ThreadContext (MonadMask)
+import Blammo.Logging.ThreadContext (MonadMask, withThreadContext)
 import Conduit
+import Data.HashMap.Strict qualified as HashMap
 import GHCTL.App
 import GHCTL.Change
-import GHCTL.Change.Apply
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
-import GHCTL.PathArg
 import GHCTL.RepositoriesYaml
-import GHCTL.Repository
+import Path (SomeBase (..))
+import Path.IO (getCurrentDir)
 import System.Exit (ExitCode (..))
 
 main :: IO ()
@@ -46,14 +46,24 @@ run
   => Options
   -> m ()
 run options = do
-  logDebug $ "Loading desired state" :# ["path" .= showPathArg options.path]
-  desired <- getDesiredRepositoriesYaml options.path
+  dir <- case options.dir of
+    Abs dir -> pure dir
+    Rel dir -> (</> dir) <$> getCurrentDir
+
+  desired <- withThreadContext ["dir" .= toFilePath dir] $ do
+    logDebug $ "Loading desired state" :# ["dir" .= toFilePath dir]
+    getDesiredRepositoriesYaml dir options.repositories
+
   changes <-
     runConduit
-      $ yieldMany desired
-      .| filterC include
-      .| sourceChanges
-      .| iterMC (when options.apply . applyChange options.delete)
+      $ yieldMany (HashMap.toList desired)
+      .| awaitForever
+        ( \(name, x) -> do
+            logDebug $ "Loading remote state" :# ["repository" .= name]
+            current <- lift $ getCurrentRepositoryYaml name
+            logDebug $ "Sourcing changes" :# ["repository" .= name]
+            yield (These x current) .| sourceChanges name
+        )
       .| sinkList
 
   logInfo
@@ -66,9 +76,3 @@ run options = do
   unless (null changes || options.apply || not options.failOnDiff) $ do
     logError "Failing due to differences found (--fail-on-diff)"
     exitWith $ ExitFailure options.failOnDiffExitCode
- where
-  include =
-    maybe
-      (const True)
-      (\names -> (`elem` names) . (.repository.full_name))
-      options.repositories

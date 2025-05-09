@@ -1,0 +1,15 @@
+repository:
+  description: Parse a string into words, like a shell would
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: "test (stack.yaml)"
+              integration_id: 15368 # GitHub Actions
+            - context: restyled
+              integration_id: 15368 # GitHub Actions
+            - context: commitlint
+              integration_id: 15368 # GitHub Actions

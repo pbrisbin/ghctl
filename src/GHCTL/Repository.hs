@@ -13,11 +13,9 @@ module GHCTL.Repository
 import GHCTL.Prelude hiding ((.=))
 
 import Autodocodec
-import GHCTL.RepositoryFullName
 
 data Repository = Repository
-  { full_name :: RepositoryFullName
-  , description :: Maybe Text
+  { description :: Maybe Text
   , private :: Bool
   , has_issues :: Bool
   , has_projects :: Bool
@@ -37,8 +35,7 @@ instance HasCodec Repository where
   codec =
     object "Repository"
       $ Repository
-      <$> (requiredField' "full_name" .= (.full_name))
-      <*> (optionalFieldOrNull' "description" .= (.description))
+      <$> (optionalFieldOrNull' "description" .= (.description))
       <*> (requiredField' "private" .= (.private))
       <*> (requiredField' "has_issues" .= (.has_issues))
       <*> (requiredField' "has_projects" .= (.has_projects))

@@ -16,14 +16,13 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-p|--path FILE] [--apply] [--no-skip-delete] [--fail-on-diff]
+Usage: ghctl [-d|--dir DIRECTORY] [--apply] [--no-skip-delete] [--fail-on-diff]
              [--fail-on-diff-exit-code NUMBER] [OWNER/NAME]
 
   Maintain GitHub settings
 
 Available options:
-  -p,--path FILE           Path to repositories definition file
-                           (default: repositories.yaml)
+  -d,--dir DIRECTORY       Path to GHCTL directory (default: ".ghctl/")
   --apply                  Apply changes to make current state look like desired
   --no-skip-delete         Don't skip changes that represent deletes
   --fail-on-diff           Fail if there are un-applied differences
@@ -33,21 +32,64 @@ Available options:
   -h,--help                Show this help text
 ```
 
-## `repositories.yaml` Schema
+## `.ghctl`
 
-The `repositories.yaml` file must contain a `repositories` key, and optionally a
-`defaults` key.
+The path given to `--dir` (`.ghctl` by default) should contain a `repositories`
+directory and optional `defaults.yaml` file.
 
-These are treated as schema-less values for the purpose of applying `defaults`
-to each element in the `repositories` list. Defaults are applied as a recursive
-merge, biased towards the `repositories` value.
+### Repositories
 
-**After defaults are applied**, each value must satisfy the [`Repository`
-schema](./repository.schema.json).
+The `repositories` directory is expected to contain 2-levels of directory. Files
+will be interpreted as `{owner}/{name}.yaml`, and their contents represent their
+desired state to verify and/or apply.
+
+### Defaults
+
+If present, the `defaults.yaml` file will be loaded and applied to each
+repository file before processing it. This step occurs as schema-less values,
+recursively merging objects and biasing towards the repository side.
+
+### Schema
+
+The repository schema can be found [here][schema]. However, this schema is only
+asserted **after defaults are applied**. Therefore, any given repository file
+itself need not be valid schema. For example, managing a repository that follows
+all defined defaults would simply be a file at the desired name and with `{}` as
+its contents.
+
+[schema]: ./repository.schema.json
+
+Our schema follows GitHub's API exactly, so feel free to go by that
+documentation as well. There is a minor difference when it comes to "keyed
+lists".
+
+For example, `rulesets` might look like:
+
+```yaml
+rulesets:
+  - name: main
+    # {more properties}
+```
+
+This is how the object will be encoded when interacting with the GitHub API and
+is supported by our schema. However, we also support decoding the following:
+
+```yaml
+rulesets:
+  main:
+    # {more properties}
+```
+
+This makes it possible to supply defaults within the sub-object at the key
+`main`. Otherwise, wanting to change any attribute of any rule would require
+respecifying the entire `rulesets` list.
+
+We support this decoding anywhere there is a clear uniquely-identifying
+property, such as `name`, `type`, or `key`.
 
 ## Examples
 
-I've started documenting my own repositories [here](./repositories.yaml).
+I've started managing my own repositories [here](./.ghctl/).
 
 ## License
 

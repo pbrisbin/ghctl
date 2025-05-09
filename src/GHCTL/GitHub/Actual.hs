@@ -20,7 +20,6 @@ import GHCTL.GitHub (MonadGitHub (..))
 import GHCTL.GitHub.Client
 import GHCTL.GitHub.Token
 import GHCTL.Repository
-import GHCTL.RepositoryFullName
 
 newtype ActualGitHub env m a = ActualGitHub
   { unwrap :: ReaderT env m a
@@ -35,30 +34,26 @@ newtype ActualGitHub env m a = ActualGitHub
   deriving (MonadLogger) via (WithLogger env m)
   deriving (MonadLoggerIO) via (WithLogger env m)
 
-newtype CreateRepo = CreateRepo
-  { unwrap :: Repository
+data CreateRepo = CreateRepo
+  { name :: Text
+  , repository :: Repository
   }
 
 instance ToJSON CreateRepo where
-  toJSON cr =
-    let
-      repo = cr.unwrap
-      name = String repo.full_name.name
-    in
-      case toJSON repo of
-        Object km -> Object $ KeyMap.insert "name" name km
-        v -> v
+  toJSON CreateRepo {name, repository} =
+    case toJSON repository of
+      Object km -> Object $ KeyMap.insert "name" (String name) km
+      v -> v
 
 instance
   (HasGitHubToken env, HasLogger env, MonadIO m)
   => MonadGitHub (ActualGitHub env m)
   where
   getUser = getGitHub "/user"
-  getRepository owner name =
-    getGitHubMaybe $ "/repos/" <> owner <> "/" <> name
-  createUserRepository = postGitHub "/user/repos" . CreateRepo
-  createOrgRepository repo =
-    postGitHub ("/orgs/" <> repo.full_name.owner <> "/repos") $ CreateRepo repo
+  getRepository owner name = getGitHubMaybe $ "/repos/" <> owner <> "/" <> name
+  createUserRepository name = postGitHub "/user/repos" . CreateRepo name
+  createOrgRepository owner name repo =
+    postGitHub ("/orgs/" <> owner <> "/repos") $ CreateRepo name repo
   getBranchProtection owner name branch =
     getGitHubMaybe
       $ "/repos/"
