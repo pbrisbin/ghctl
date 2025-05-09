@@ -18,6 +18,7 @@ import GHCTL.GitHub qualified as GitHub
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
+import GHCTL.User
 import GHCTL.Variable
 
 class HasCRUD a m where
@@ -26,7 +27,12 @@ class HasCRUD a m where
   delete :: Repository -> a -> m ()
 
 instance MonadGitHub m => HasCRUD Repository m where
-  create = error "unimplemented"
+  create _ desired = do
+    User {login} <- GitHub.getUser
+
+    if login == desired.full_name.owner
+      then GitHub.createUserRepository desired
+      else GitHub.createOrgRepository desired
 
   update _ desired _ =
     GitHub.updateRepository

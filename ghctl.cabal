@@ -51,6 +51,7 @@ library
       GHCTL.RulesetEnforcement
       GHCTL.SchemaGen.Main
       GHCTL.TextBoundedEnum
+      GHCTL.User
       GHCTL.Variable
   other-modules:
       Paths_ghctl
