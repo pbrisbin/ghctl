@@ -17,10 +17,17 @@ import GHCTL.BranchProtection
 import GHCTL.Identified
 import GHCTL.Repository
 import GHCTL.Ruleset
+import GHCTL.User
 import GHCTL.Variable
 
 class Monad m => MonadGitHub m where
+  getUser :: m User
+
   getRepository :: Text -> Text -> m (Maybe Repository)
+
+  createUserRepository :: Repository -> m ()
+
+  createOrgRepository :: Repository -> m ()
 
   getBranchProtection :: Text -> Text -> Text -> m (Maybe BranchProtection)
 
