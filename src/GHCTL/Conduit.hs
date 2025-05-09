@@ -56,7 +56,7 @@ pairTheseOn
   -> ConduitT i (These a a) m ()
 pairTheseOn f = \case
   This as -> yieldMany $ map This as
-  That bs -> yieldMany $ map This bs
+  That bs -> yieldMany $ map That bs
   These as [] -> yieldMany $ map This as
   These [] bs -> yieldMany $ map That bs
   These (a : as) (b : bs) -> case comparing f a b of

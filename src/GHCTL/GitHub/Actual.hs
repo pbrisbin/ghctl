@@ -50,10 +50,19 @@ instance
   => MonadGitHub (ActualGitHub env m)
   where
   getUser = getGitHub "/user"
-  getRepository owner name = getGitHubMaybe $ "/repos/" <> owner <> "/" <> name
+
   createUserRepository name = postGitHub "/user/repos" . CreateRepo name
+
   createOrgRepository owner name repo =
     postGitHub ("/orgs/" <> owner <> "/repos") $ CreateRepo name repo
+
+  getRepository owner name =
+    getGitHubMaybe $ "/repos/" <> owner <> "/" <> name
+
+  updateRepository owner name = postGitHub $ "/repos/" <> owner <> "/" <> name
+
+  deleteRepository owner name = deleteGitHub $ "/repos/" <> owner <> "/" <> name
+
   getBranchProtection owner name branch =
     getGitHubMaybe
       $ "/repos/"
@@ -63,17 +72,43 @@ instance
       <> "/branches/"
       <> branch
       <> "/protection"
-  getAllRepositoryRulesets owner name =
-    getGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
-  getRepositoryRuleset owner name rid =
-    getGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets/" <> show rid
-  listRepositoryVariables owner name =
-    getGitHub $ "/repos/" <> owner <> "/" <> name <> "/actions/variables"
-  updateRepository owner name =
-    postGitHub $ "/repos/" <> owner <> "/" <> name
-  updateRepositoryRuleset owner name rid =
-    putGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets/" <> show rid
+
   createRepositoryRuleset owner name =
     postGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
+
+  listRepositoryRulesets owner name =
+    getGitHub $ "/repos/" <> owner <> "/" <> name <> "/rulesets"
+
+  getRepositoryRuleset owner name rid =
+    getGitHub
+      $ "/repos/"
+      <> owner
+      <> "/"
+      <> name
+      <> "/rulesets/"
+      <> show rid
+
+  updateRepositoryRuleset owner name rid =
+    putGitHub
+      $ "/repos/"
+      <> owner
+      <> "/"
+      <> name
+      <> "/rulesets/"
+      <> show rid
+
   createRepositoryVariable owner name =
-    postGitHub $ "/repos/" <> owner <> "/" <> name <> "/actions/variables"
+    postGitHub
+      $ "/repos/"
+      <> owner
+      <> "/"
+      <> name
+      <> "/actions/variables"
+
+  listRepositoryVariables owner name =
+    getGitHub
+      $ "/repos/"
+      <> owner
+      <> "/"
+      <> name
+      <> "/actions/variables"

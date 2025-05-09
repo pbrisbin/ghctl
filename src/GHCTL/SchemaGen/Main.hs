@@ -20,7 +20,7 @@ import Data.Aeson.Encode.Pretty
   , encodePretty'
   )
 import Data.ByteString.Lazy qualified as BSL
-import GHCTL.RepositoriesYaml
+import GHCTL.RepositoryYaml
 
 main :: IO ()
 main = BSL.putStr $ encodePretty $ jsonSchemaViaCodec @RepositoryYaml

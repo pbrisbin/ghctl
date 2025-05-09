@@ -62,6 +62,7 @@ library:
     - autodocodec-schema
     - bytestring
     - conduit
+    - containers
     - exceptions
     - http-client
     - http-conduit

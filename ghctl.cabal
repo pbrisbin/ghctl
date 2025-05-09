@@ -29,6 +29,8 @@ library
       GHCTL.BranchProtection
       GHCTL.Change
       GHCTL.Change.Apply
+      GHCTL.Change.Log
+      GHCTL.Change.Source
       GHCTL.Conduit
       GHCTL.CRUD
       GHCTL.Diff
@@ -43,9 +45,11 @@ library
       GHCTL.Main
       GHCTL.Options
       GHCTL.Prelude
-      GHCTL.RepositoriesYaml
       GHCTL.Repository
       GHCTL.RepositoryFullName
+      GHCTL.RepositoryYaml
+      GHCTL.RepositoryYaml.Fetch
+      GHCTL.RepositoryYaml.Load
       GHCTL.Ruleset
       GHCTL.RulesetEnforcement
       GHCTL.SchemaGen.Main
@@ -84,6 +88,7 @@ library
     , base <5
     , bytestring
     , conduit
+    , containers
     , exceptions
     , http-client
     , http-conduit
@@ -162,7 +167,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       GHCTL.KeyedListSpec
-      GHCTL.RepositoriesYamlSpec
+      GHCTL.RepositoriesYaml.FetchSpec
       Paths_ghctl
   hs-source-dirs:
       test

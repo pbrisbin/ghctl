@@ -41,14 +41,8 @@ applyAttributeChange
   :: (HasCRUD a m, MonadLogger m) => Delete -> Attribute a -> m ()
 applyAttributeChange d Attribute {repository, desiredCurrent} =
   case desiredCurrent of
-    This a -> do
-      logInfo "Creating resource"
-      CRUD.create repository a
+    This a -> CRUD.create repository a
     That b -> case d of
-      Delete -> do
-        logInfo "Deleting resource"
-        CRUD.delete repository b
+      Delete -> CRUD.delete repository b
       Don'tDelete -> logWarn "Not deleting without --no-skip-delete"
-    These a b -> do
-      logInfo "Updating resource"
-      CRUD.update repository a b
+    These a b -> CRUD.update repository a b
