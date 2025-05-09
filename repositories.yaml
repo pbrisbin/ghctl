@@ -145,3 +145,6 @@ repositories:
                   integration_id: 15368 # GitHub Actions
 
     variables: []
+
+  - repository:
+      full_name: pbrisbin/ghctl-new-test

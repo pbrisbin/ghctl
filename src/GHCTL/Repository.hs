@@ -38,7 +38,7 @@ instance HasCodec Repository where
     object "Repository"
       $ Repository
       <$> (requiredField' "full_name" .= (.full_name))
-      <*> (optionalField' "description" .= (.description))
+      <*> (optionalFieldOrNull' "description" .= (.description))
       <*> (requiredField' "private" .= (.private))
       <*> (requiredField' "has_issues" .= (.has_issues))
       <*> (requiredField' "has_projects" .= (.has_projects))
