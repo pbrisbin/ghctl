@@ -42,7 +42,6 @@ library
       GHCTL.LogFormatter
       GHCTL.Main
       GHCTL.Options
-      GHCTL.PathArg
       GHCTL.Prelude
       GHCTL.RepositoriesYaml
       GHCTL.Repository
@@ -90,13 +89,11 @@ library
     , http-conduit
     , http-types
     , lens
-    , microlens
-    , microlens-aeson
     , monad-logger-aeson
     , optparse-applicative
     , path
+    , path-io
     , relude
-    , semigroupoids
     , text
     , these
     , unliftio

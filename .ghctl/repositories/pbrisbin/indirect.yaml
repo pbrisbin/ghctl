@@ -1,0 +1,15 @@
+repository:
+  description: Executable used to indirectly call other executables
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: test
+              integration_id: 15368 # GitHub Actions
+            - context: lint
+              integration_id: 15368 # GitHub Actions
+
+variables: []

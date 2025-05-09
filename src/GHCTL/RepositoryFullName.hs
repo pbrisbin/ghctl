@@ -20,7 +20,8 @@ data RepositoryFullName = RepositoryFullName
   { owner :: Text
   , name :: Text
   }
-  deriving stock (Eq, Ord, Show)
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving anyclass (Hashable)
   deriving (FromJSON, ToJSON) via (Autodocodec RepositoryFullName)
 
 instance ToText RepositoryFullName where

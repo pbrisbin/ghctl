@@ -16,13 +16,12 @@ module GHCTL.Options
 import GHCTL.Prelude
 
 import GHCTL.Change.Apply (Delete, deleteOption)
-import GHCTL.PathArg
 import GHCTL.RepositoryFullName
 import Options.Applicative
-import Path (relfile)
+import Path (SomeBase (..), parseSomeDir, reldir)
 
 data Options = Options
-  { path :: PathArg
+  { dir :: SomeBase Dir
   , apply :: Bool
   , delete :: Delete
   , failOnDiff :: Bool
@@ -37,14 +36,14 @@ optionsParser :: Parser Options
 optionsParser =
   Options
     <$> option
-      (eitherReader readPathArg)
+      (eitherReader $ first show . parseSomeDir)
       ( mconcat
-          [ short 'p'
-          , long "path"
-          , help "Path to repositories definition file"
-          , metavar "FILE"
-          , value (PathArgRel [relfile|./repositories.yaml|])
-          , showDefaultWith showPathArg
+          [ short 'd'
+          , long "dir"
+          , help "Path to GHCTL directory"
+          , metavar "DIRECTORY"
+          , value (Rel [reldir|./.ghctl|])
+          , showDefault
           ]
       )
     <*> switch

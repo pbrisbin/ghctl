@@ -1,0 +1,13 @@
+repository:
+  description: Produce Text with terminal escape sequences
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: "test (stack.yaml)"
+              integration_id: 15368 # GitHub Actions
+
+variables: []

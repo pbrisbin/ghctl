@@ -18,28 +18,16 @@ import GHCTL.GitHub qualified as GitHub
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
-import GHCTL.User
 import GHCTL.Variable
 
 class HasCRUD a m where
-  create :: Repository -> a -> m ()
-  update :: Repository -> a -> a -> m ()
-  delete :: Repository -> a -> m ()
+  create :: RepositoryFullName -> a -> m ()
+  update :: RepositoryFullName -> a -> a -> m ()
+  delete :: RepositoryFullName -> a -> m ()
 
 instance MonadGitHub m => HasCRUD Repository m where
-  create _ desired = do
-    User {login} <- GitHub.getUser
-
-    if login == desired.full_name.owner
-      then GitHub.createUserRepository desired
-      else GitHub.createOrgRepository desired
-
-  update _ desired _ =
-    GitHub.updateRepository
-      desired.full_name.owner
-      desired.full_name.name
-      desired
-
+  create name = GitHub.createRepository name.owner name.name
+  update name desired _ = GitHub.updateRepository name.owner name.name desired
   delete = error "unimplemented"
 
 instance HasCRUD BranchProtection m where
@@ -48,16 +36,12 @@ instance HasCRUD BranchProtection m where
   delete = error "unimplemented"
 
 instance (MonadGitHub m, MonadLogger m) => HasCRUD Ruleset m where
-  create repository =
-    GitHub.createRepositoryRuleset
-      repository.full_name.owner
-      repository.full_name.name
-
-  update repository desired current = do
+  create name = GitHub.createRepositoryRuleset name.owner name.name
+  update name desired current = do
     mrid <-
       GitHub.getRepositoryRulesetIdByName
-        repository.full_name.owner
-        repository.full_name.name
+        name.owner
+        name.name
         current.name
 
     case mrid of
@@ -65,23 +49,19 @@ instance (MonadGitHub m, MonadLogger m) => HasCRUD Ruleset m where
         logWarn
           $ "Cannot apply UpdateRuleset"
           :# [ "reason" .= ("no ruleset with given name" :: Text)
-             , "repository" .= repository.full_name
+             , "repository" .= name
              , "name" .= current.name
              ]
       Just rid ->
         GitHub.updateRepositoryRuleset
-          repository.full_name.owner
-          repository.full_name.name
+          name.owner
+          name.name
           rid
           desired
 
   delete = error "unimplemented"
 
 instance MonadGitHub m => HasCRUD Variable m where
-  create repository =
-    GitHub.createRepositoryVariable
-      repository.full_name.owner
-      repository.full_name.name
-
+  create name = GitHub.createRepositoryVariable name.owner name.name
   update = error "unimplemented"
   delete = error "unimplemented"

@@ -25,9 +25,17 @@ class Monad m => MonadGitHub m where
 
   getRepository :: Text -> Text -> m (Maybe Repository)
 
-  createUserRepository :: Repository -> m ()
+  createUserRepository :: Text -> Repository -> m ()
 
-  createOrgRepository :: Repository -> m ()
+  createOrgRepository :: Text -> Text -> Repository -> m ()
+
+  createRepository :: Text -> Text -> Repository -> m ()
+  createRepository owner name repo = do
+    User {login} <- getUser
+
+    if login == owner
+      then createUserRepository name repo
+      else createOrgRepository owner name repo
 
   getBranchProtection :: Text -> Text -> Text -> m (Maybe BranchProtection)
 
