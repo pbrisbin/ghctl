@@ -11,6 +11,7 @@ module GHCTL.GitHub.Client
   , getGitHubMaybe
   , postGitHub
   , putGitHub
+  , deleteGitHub
 
     -- * Lower-level
   , GitHubRequest (..)
@@ -124,6 +125,23 @@ putGitHub path body =
       , body = Just body
       , onSuccess = const $ Right ()
       , onNotFound = Nothing
+      }
+
+deleteGitHub
+  :: ( HasGitHubToken env
+     , MonadIO m
+     , MonadLogger m
+     , MonadReader env m
+     )
+  => Text -> m ()
+deleteGitHub path =
+  githubRequest
+    $ GitHubRequest
+      { path
+      , method = "DELETE"
+      , body = noBody
+      , onSuccess = const $ Right ()
+      , onNotFound = Just () -- deleting something non-existent is OK
       }
 
 githubRequest

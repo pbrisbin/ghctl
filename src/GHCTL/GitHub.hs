@@ -23,37 +23,26 @@ import GHCTL.Variable
 class Monad m => MonadGitHub m where
   getUser :: m User
 
-  getRepository :: Text -> Text -> m (Maybe Repository)
-
   createUserRepository :: Text -> Repository -> m ()
 
   createOrgRepository :: Text -> Text -> Repository -> m ()
 
-  createRepository :: Text -> Text -> Repository -> m ()
-  createRepository owner name repo = do
-    User {login} <- getUser
-
-    if login == owner
-      then createUserRepository name repo
-      else createOrgRepository owner name repo
-
-  getBranchProtection :: Text -> Text -> Text -> m (Maybe BranchProtection)
-
-  getAllRepositoryRulesets :: Text -> Text -> m [Identified]
-
-  getRepositoryRuleset :: Text -> Text -> Int -> m Ruleset
-
-  getRepositoryRulesetIdByName :: Text -> Text -> Text -> m (Maybe Int)
-  getRepositoryRulesetIdByName owner repo name = do
-    rulesets <- getAllRepositoryRulesets owner repo
-    pure $ (.id) <$> find ((== name) . (.name)) rulesets
-
-  listRepositoryVariables :: Text -> Text -> m Variables
+  getRepository :: Text -> Text -> m (Maybe Repository)
 
   updateRepository :: Text -> Text -> Repository -> m ()
 
-  updateRepositoryRuleset :: Text -> Text -> Int -> Ruleset -> m ()
+  deleteRepository :: Text -> Text -> m ()
+
+  getBranchProtection :: Text -> Text -> Text -> m (Maybe BranchProtection)
 
   createRepositoryRuleset :: Text -> Text -> Ruleset -> m ()
 
+  listRepositoryRulesets :: Text -> Text -> m [Identified]
+
+  getRepositoryRuleset :: Text -> Text -> Int -> m Ruleset
+
+  updateRepositoryRuleset :: Text -> Text -> Int -> Ruleset -> m ()
+
   createRepositoryVariable :: Text -> Text -> Variable -> m ()
+
+  listRepositoryVariables :: Text -> Text -> m Variables

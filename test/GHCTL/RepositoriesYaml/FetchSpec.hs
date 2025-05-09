@@ -1,20 +1,20 @@
 -- |
 --
--- Module      : GHCTL.RepositoriesYamlSpec
+-- Module      : GHCTL.RepositoriesYaml.FetchSpec
 -- Copyright   : (c) 2025 Patrick Brisbin
 -- License     : AGPL-3
 -- Maintainer  : pbrisbin@gmail.com
 -- Stability   : experimental
 -- Portability : POSIX
-module GHCTL.RepositoriesYamlSpec
+module GHCTL.RepositoriesYaml.FetchSpec
   ( spec
   ) where
 
 import GHCTL.Prelude
 
 import GHCTL.App
-import GHCTL.RepositoriesYaml
 import GHCTL.RepositoryFullName
+import GHCTL.RepositoryYaml.Fetch
 import Test.Hspec
 
 spec :: Spec

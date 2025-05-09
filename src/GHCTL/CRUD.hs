@@ -18,6 +18,7 @@ import GHCTL.GitHub qualified as GitHub
 import GHCTL.Repository
 import GHCTL.RepositoryFullName
 import GHCTL.Ruleset
+import GHCTL.User qualified as GitHub
 import GHCTL.Variable
 
 class HasCRUD a m where
@@ -26,9 +27,9 @@ class HasCRUD a m where
   delete :: RepositoryFullName -> a -> m ()
 
 instance MonadGitHub m => HasCRUD Repository m where
-  create name = GitHub.createRepository name.owner name.name
+  create = createRepository
   update name desired _ = GitHub.updateRepository name.owner name.name desired
-  delete = error "unimplemented"
+  delete name _ = GitHub.deleteRepository name.owner name.name
 
 instance HasCRUD BranchProtection m where
   create = error "unimplemented"
@@ -37,31 +38,51 @@ instance HasCRUD BranchProtection m where
 
 instance (MonadGitHub m, MonadLogger m) => HasCRUD Ruleset m where
   create name = GitHub.createRepositoryRuleset name.owner name.name
-  update name desired current = do
-    mrid <-
-      GitHub.getRepositoryRulesetIdByName
-        name.owner
-        name.name
-        current.name
-
-    case mrid of
-      Nothing ->
-        logWarn
-          $ "Cannot apply UpdateRuleset"
-          :# [ "reason" .= ("no ruleset with given name" :: Text)
-             , "repository" .= name
-             , "name" .= current.name
-             ]
-      Just rid ->
-        GitHub.updateRepositoryRuleset
-          name.owner
-          name.name
-          rid
-          desired
-
+  update = updateRuleset
   delete = error "unimplemented"
 
 instance MonadGitHub m => HasCRUD Variable m where
   create name = GitHub.createRepositoryVariable name.owner name.name
   update = error "unimplemented"
   delete = error "unimplemented"
+
+createRepository :: MonadGitHub m => RepositoryFullName -> Repository -> m ()
+createRepository name repo = do
+  GitHub.User {login} <- GitHub.getUser
+
+  if login == name.owner
+    then GitHub.createUserRepository name.name repo
+    else GitHub.createOrgRepository name.owner name.name repo
+
+updateRuleset
+  :: (MonadGitHub m, MonadLogger m)
+  => RepositoryFullName
+  -> Ruleset
+  -> Ruleset
+  -> m ()
+updateRuleset repo desired current = do
+  mRuleset <- getRulesetByName repo current.name
+
+  case mRuleset of
+    Nothing ->
+      logWarn
+        $ "Cannot apply UpdateRuleset"
+        :# [ "reason" .= ("no ruleset with given name" :: Text)
+           , "repository" .= repo
+           , "name" .= current.name
+           ]
+    Just ruleset ->
+      GitHub.updateRepositoryRuleset
+        repo.owner
+        repo.name
+        ruleset.id
+        desired
+
+getRulesetByName
+  :: MonadGitHub m
+  => RepositoryFullName
+  -> Text
+  -> m (Maybe GitHub.Identified)
+getRulesetByName repo name =
+  find ((== name) . (.name))
+    <$> GitHub.listRepositoryRulesets repo.owner repo.name
