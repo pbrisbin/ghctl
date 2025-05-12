@@ -63,6 +63,10 @@ run options = do
 
   colors <- getColorsLogger
 
+  logDebug
+    $ "Sourcing changes"
+    :# ["numRepos" .= length desired, "willApply" .= options.apply]
+
   changes <-
     runConduit
       $ yieldMany (Map.toList desired)
@@ -82,10 +86,8 @@ run options = do
     exitWith $ ExitFailure options.failOnDiffExitCode
 
 sourceRepositoryChanges
-  :: (MonadGitHub m, MonadLogger m)
+  :: MonadGitHub m
   => ConduitT (RepositoryFullName, Maybe RepositoryYaml) Change m ()
 sourceRepositoryChanges = awaitForever $ \(name, desired) -> do
-  logDebug $ "Loading remote state" :# ["repository" .= name]
   current <- lift $ getCurrentRepositoryYaml name
-  logDebug $ "Sourcing changes" :# ["repository" .= name]
   yield (These desired current) .| sourceChanges name
