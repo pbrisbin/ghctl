@@ -1,13 +1,13 @@
 -- |
 --
--- Module      : GHCTL.SchemaGen.Main
+-- Module      : GHCTL.SchemaGen
 -- Copyright   : (c) 2025 Patrick Brisbin
 -- License     : AGPL-3
 -- Maintainer  : pbrisbin@gmail.com
 -- Stability   : experimental
 -- Portability : POSIX
-module GHCTL.SchemaGen.Main
-  ( main
+module GHCTL.SchemaGen
+  ( prettySchema
   ) where
 
 import GHCTL.Prelude
@@ -22,13 +22,8 @@ import Data.Aeson.Encode.Pretty
 import Data.ByteString.Lazy qualified as BSL
 import GHCTL.RepositoryYaml
 
-main :: IO ()
-main = BSL.putStr $ encodePretty $ jsonSchemaViaCodec @RepositoryYaml
+prettySchema :: Text
+prettySchema = decodeUtf8 $ encodePretty $ jsonSchemaViaCodec @RepositoryYaml
 
 encodePretty :: ToJSON a => a -> BSL.ByteString
-encodePretty =
-  encodePretty'
-    $ defConfig
-      { confIndent = Spaces 2
-      , confTrailingNewline = True
-      }
+encodePretty = encodePretty' $ defConfig {confIndent = Spaces 2}
