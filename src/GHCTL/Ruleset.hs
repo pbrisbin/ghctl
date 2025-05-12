@@ -337,7 +337,7 @@ instance ToText MergeMethod where
     MergeMethodRebase -> "rebase"
 
 data RulesetRuleRequiredStatusChecksParameters = RulesetRuleRequiredStatusChecksParameters
-  { required_status_checks :: [RequiredStatusCheck]
+  { required_status_checks :: KeyedList "context" RequiredStatusCheck
   , strict_required_status_checks_policy :: Bool
   }
   deriving stock (Eq, Generic, Show)

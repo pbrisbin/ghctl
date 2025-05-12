@@ -348,11 +348,14 @@
           "type": "boolean"
         },
         "description": {
-          "type": "string"
-        },
-        "full_name": {
-          "$comment": "owner/name",
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
         },
         "has_issues": {
           "type": "boolean"
@@ -378,8 +381,7 @@
         "has_wiki",
         "has_projects",
         "has_issues",
-        "private",
-        "full_name"
+        "private"
       ],
       "type": "object"
     },
@@ -768,24 +770,31 @@
                               "$comment": "RulesetRuleRequiredStatusChecksParameters",
                               "properties": {
                                 "required_status_checks": {
-                                  "items": {
-                                    "$comment": "RequiredStatusCheck",
-                                    "properties": {
-                                      "context": {
-                                        "type": "string"
+                                  "anyOf": [
+                                    {
+                                      "items": {
+                                        "$comment": "RequiredStatusCheck",
+                                        "properties": {
+                                          "context": {
+                                            "type": "string"
+                                          },
+                                          "integration_id": {
+                                            "maximum": 9223372036854775807,
+                                            "minimum": -9223372036854775808,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "context"
+                                        ],
+                                        "type": "object"
                                       },
-                                      "integration_id": {
-                                        "maximum": 9223372036854775807,
-                                        "minimum": -9223372036854775808,
-                                        "type": "integer"
-                                      }
+                                      "type": "array"
                                     },
-                                    "required": [
-                                      "context"
-                                    ],
-                                    "type": "object"
-                                  },
-                                  "type": "array"
+                                    {
+                                      "$comment": "An object of objects keyed by the value to use for their context property"
+                                    }
+                                  ]
                                 },
                                 "strict_required_status_checks_policy": {
                                   "type": "boolean"
