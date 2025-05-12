@@ -43,9 +43,9 @@ rulesets:
       required_status_checks:
         parameters:
           required_status_checks:
-            - context: test
+            test:
               integration_id: 15368 # GitHub Actions
-            - context: restyled
+            restyled:
               integration_id: 15368 # GitHub Actions
           strict_required_status_checks_policy: false
 
