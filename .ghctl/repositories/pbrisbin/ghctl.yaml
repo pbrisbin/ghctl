@@ -1,2 +1,11 @@
 repository:
   description: CLI for maintaining GitHub settings as IaC
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            test-plan:
+              integration_id: 15368 # GitHub Actions
