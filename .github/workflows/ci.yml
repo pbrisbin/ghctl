@@ -41,9 +41,7 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            repositories.yaml
-          sparse-checkout-cone-mode: false
+          sparse-checkout: .ghctl
 
       - id: token
         uses: actions/create-github-app-token@v1
