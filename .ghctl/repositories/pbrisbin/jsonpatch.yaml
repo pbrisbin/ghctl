@@ -1,0 +1,12 @@
+repository:
+  description: >-
+    Haskell package for parsing and applying JSON Patches
+
+rulesets:
+  main:
+    rules:
+      required_status_checks:
+        parameters:
+          required_status_checks:
+            - context: test (stack.yaml)
+              integration_id: 15368 # GitHub Actions
