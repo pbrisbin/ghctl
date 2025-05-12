@@ -16,20 +16,50 @@ TODO
 
 ```console
 % ghctl --help
-Usage: ghctl [-d|--dir DIRECTORY] [--apply] [--no-skip-delete] [--fail-on-diff]
-             [--fail-on-diff-exit-code NUMBER] [OWNER/NAME]
+Usage: ghctl [-d|--dir DIRECTORY] COMMAND
 
   Maintain GitHub settings
 
 Available options:
   -d,--dir DIRECTORY       Path to GHCTL directory (default: ".ghctl/")
-  --apply                  Apply changes to make current state look like desired
-  --no-skip-delete         Don't skip changes that represent deletes
+  -h,--help                Show this help text
+
+Available commands:
+  plan                     Show differences between desired and current
+  apply                    Apply changes to make current match desired
+  schema                   Dump configuration schema
+```
+
+```console
+% ghctl plan --help
+Usage: ghctl plan [--fail-on-diff] [--fail-on-diff-exit-code NUMBER]
+                  [OWNER/NAME]
+
+  Show differences between desired and current
+
+Available options:
   --fail-on-diff           Fail if there are un-applied differences
   --fail-on-diff-exit-code NUMBER
                            Exit code for --fail-on-diff (default: 228)
   OWNER/NAME               Limit processing to the given repositories
   -h,--help                Show this help text
+```
+
+```console
+% ghctl apply --help
+Usage: ghctl apply [--no-skip-delete] [OWNER/NAME]
+
+  Apply changes to make current match desired
+
+Available options:
+  --no-skip-delete         Don't skip changes that represent deletes
+  OWNER/NAME               Limit processing to the given repositories
+  -h,--help                Show this help text
+```
+
+```console
+% ghctl import --help
+TODO
 ```
 
 ## `.ghctl`

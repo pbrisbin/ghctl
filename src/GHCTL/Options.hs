@@ -10,6 +10,9 @@
 -- Portability : POSIX
 module GHCTL.Options
   ( Options (..)
+  , Command (..)
+  , PlanOptions (..)
+  , ApplyOptions (..)
   , parseOptions
   ) where
 
@@ -22,11 +25,7 @@ import Path (SomeBase (..), parseSomeDir, reldir)
 
 data Options = Options
   { dir :: SomeBase Dir
-  , apply :: Bool
-  , delete :: Delete
-  , failOnDiff :: Bool
-  , failOnDiffExitCode :: Int
-  , repositories :: Maybe (NonEmpty RepositoryFullName)
+  , command :: Command
   }
 
 parseOptions :: IO Options
@@ -46,14 +45,38 @@ optionsParser =
           , showDefault
           ]
       )
-    <*> switch
-      ( mconcat
-          [ long "apply"
-          , help "Apply changes to make current state look like desired"
-          ]
-      )
-    <*> deleteOption
-    <*> switch
+    <*> commandParser
+
+data Command
+  = Plan PlanOptions
+  | Apply ApplyOptions
+  | Schema
+
+commandParser :: Parser Command
+commandParser =
+  subparser
+    $ mconcat
+      [ command "plan"
+          $ withInfo "Show differences between desired and current"
+          $ Plan
+          <$> planOptionsParser
+      , command "apply"
+          $ withInfo "Apply changes to make current match desired"
+          $ Apply
+          <$> applyOptionsParser
+      , command "schema" $ withInfo "Dump configuration schema" $ pure Schema
+      ]
+
+data PlanOptions = PlanOptions
+  { failOnDiff :: Bool
+  , failOnDiffExitCode :: Int
+  , repositories :: Maybe (NonEmpty RepositoryFullName)
+  }
+
+planOptionsParser :: Parser PlanOptions
+planOptionsParser =
+  PlanOptions
+    <$> switch
       ( mconcat
           [ long "fail-on-diff"
           , help "Fail if there are un-applied differences"
@@ -69,6 +92,17 @@ optionsParser =
           , showDefault
           ]
       )
+    <*> (nonEmpty <$> many repositoryOption)
+
+data ApplyOptions = ApplyOptions
+  { delete :: Delete
+  , repositories :: Maybe (NonEmpty RepositoryFullName)
+  }
+
+applyOptionsParser :: Parser ApplyOptions
+applyOptionsParser =
+  ApplyOptions
+    <$> deleteOption
     <*> (nonEmpty <$> many repositoryOption)
 
 repositoryOption :: Parser RepositoryFullName
