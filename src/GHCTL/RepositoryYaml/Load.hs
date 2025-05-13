@@ -23,7 +23,7 @@ import Data.Map.Strict qualified as Map
 import Data.Yaml qualified as Yaml
 import GHCTL.RepositoryFullName
 import GHCTL.RepositoryYaml
-import Path (reldir, relfile, splitExtension)
+import Path (reldir, relfile)
 import Path.IO (doesFileExist, listDirRecurRel)
 
 -- | Load on-disk state as a map of 'RepositoryYaml's by name
@@ -76,7 +76,7 @@ loadRepository
   -> m (Map RepositoryFullName (Maybe RepositoryYaml))
 loadRepository defaults dir path = do
   withThreadContext ["path" .= toFilePath path] $ do
-    case parseRepositoryPath path of
+    case repositoryFullNameFromFile path of
       Left err -> do
         logWarn $ "Repository path is invalid, skipping" :# ["error" .= err]
         pure mempty
@@ -84,13 +84,6 @@ loadRepository defaults dir path = do
         val <- decodeYamlOrDie $ dir </> path
         yaml <- fromJSONOrDie $ overwriteValues defaults val
         pure $ Map.singleton name $ Just yaml
-
-parseRepositoryPath :: Path Rel File -> Either String RepositoryFullName
-parseRepositoryPath path =
-  case splitExtension path of
-    Nothing -> Left "path must have .yaml extension (saw none)"
-    Just (base, ".yaml") -> repositoryFullNameFromText $ pack $ toFilePath base
-    Just (_, ext) -> Left $ "path must have .yaml extension (saw " <> ext <> ")"
 
 overwriteValues :: Value -> Value -> Value
 overwriteValues = curry $ \case
