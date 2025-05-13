@@ -9,12 +9,14 @@
 module GHCTL.RepositoryFullName
   ( RepositoryFullName (..)
   , repositoryFullNameFromText
+  , repositoryFullNameFromFile
   ) where
 
 import GHCTL.Prelude
 
 import Autodocodec
 import Data.Text qualified as T
+import Path (splitExtension)
 
 data RepositoryFullName = RepositoryFullName
   { owner :: Text
@@ -42,3 +44,10 @@ repositoryFullNameFromText x = case T.splitOn "/" x of
       <> unpack x
       <> ". Must be two /-separated parts, but got "
       <> show ps
+
+repositoryFullNameFromFile :: Path Rel File -> Either String RepositoryFullName
+repositoryFullNameFromFile path =
+  case splitExtension path of
+    Nothing -> Left "path must have .yaml extension (saw none)"
+    Just (base, ".yaml") -> repositoryFullNameFromText $ pack $ toFilePath base
+    Just (_, ext) -> Left $ "path must have .yaml extension (saw " <> ext <> ")"
