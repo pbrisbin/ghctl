@@ -7,74 +7,19 @@
 -- Stability   : experimental
 -- Portability : POSIX
 module GHCTL.RepositoryYaml.Load
-  ( getDesiredRepositoryYamls
+  ( loadRepositoryYaml
   ) where
 
 import GHCTL.Prelude
 
-import Autodocodec (HasCodec, parseJSONViaCodec)
-import Autodocodec.Yaml (eitherDecodeYamlViaCodec)
 import Blammo.Logging.ThreadContext (MonadMask, withThreadContext)
 import Data.Aeson (Value (..))
 import Data.Aeson.KeyMap qualified as KeyMap
-import Data.Aeson.Types qualified as Aeson
-import Data.Map.Merge.Strict qualified as Map
 import Data.Map.Strict qualified as Map
-import Data.Yaml qualified as Yaml
 import GHCTL.RepositoryFullName
 import GHCTL.RepositoryYaml
-import Path (reldir, relfile)
-import Path.IO (doesFileExist, listDirRecurRel)
 
--- | Load on-disk state as a map of 'RepositoryYaml's by name
-getDesiredRepositoryYamls
-  :: (MonadIO m, MonadLogger m, MonadMask m)
-  => Path Abs Dir
-  -> Maybe (NonEmpty RepositoryFullName)
-  -> m (Map RepositoryFullName (Maybe RepositoryYaml))
-getDesiredRepositoryYamls dir mNames = do
-  let
-    defaultsFiles =
-      [ dir </> [relfile|defaults.yml|]
-      , dir </> [relfile|defaults.yaml|]
-      ]
-    repositoriesDir = dir </> [reldir|repositories|]
-
-  defaults <-
-    maybe (pure $ Object mempty) decodeYamlOrDie =<< getFileExists defaultsFiles
-
-  (_, yamls) <- listDirRecurRel repositoriesDir
-  repositories <- foldMapM (loadRepository defaults repositoriesDir) yamls
-
-  pure $ maybe repositories (`filterAndPadNothings` repositories) mNames
-
-getFileExists :: MonadIO m => [Path b File] -> m (Maybe (Path b File))
-getFileExists = \case
-  [] -> pure Nothing
-  (p : ps) -> do
-    exists <- doesFileExist p
-    if exists
-      then pure $ Just p
-      else getFileExists ps
-
-filterAndPadNothings
-  :: Ord k
-  => NonEmpty k
-  -> Map k (Maybe a)
-  -> Map k (Maybe a)
-filterAndPadNothings =
-  Map.merge onGiven onPresent onBoth . foldMap (`Map.singleton` Nothing)
- where
-  -- given, not present -> keep a Nothing value
-  onGiven = Map.preserveMissing
-
-  -- present, not given -> filter out
-  onPresent = Map.dropMissing
-
-  -- given and present -> keep
-  onBoth = Map.zipWithMatched $ const $ const id
-
-loadRepository
+loadRepositoryYaml
   :: (MonadIO m, MonadLogger m, MonadMask m)
   => Value
   -- ^ Defaults
@@ -83,7 +28,7 @@ loadRepository
   -> Path Rel File
   -- ^ Repository path, expected to be @{owner}/{name}.yaml@
   -> m (Map RepositoryFullName (Maybe RepositoryYaml))
-loadRepository defaults dir path = do
+loadRepositoryYaml defaults dir path = do
   withThreadContext ["path" .= toFilePath path] $ do
     case repositoryFullNameFromFile path of
       Left err -> do
@@ -98,24 +43,3 @@ overwriteValues :: Value -> Value -> Value
 overwriteValues = curry $ \case
   (Object a, Object b) -> Object $ KeyMap.unionWith overwriteValues a b
   (_, v) -> v
-
-decodeYamlOrDie
-  :: forall m a b
-   . (HasCodec a, MonadIO m, MonadLogger m)
-  => Path b File
-  -> m a
-decodeYamlOrDie path = do
-  bytes <- readFileBS $ toFilePath path
-  fromRightOrDie err $ eitherDecodeYamlViaCodec bytes
- where
-  err ex = pack (Yaml.prettyPrintParseException ex) :# []
-
-fromJSONOrDie
-  :: forall m a
-   . (HasCodec a, MonadIO m, MonadLogger m)
-  => Value
-  -> m a
-fromJSONOrDie value =
-  fromRightOrDie err $ Aeson.parseEither parseJSONViaCodec value
- where
-  err ex = pack ex :# ["input" .= value]

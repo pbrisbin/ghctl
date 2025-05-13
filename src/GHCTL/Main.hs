@@ -14,7 +14,7 @@ import GHCTL.Prelude
 
 import Blammo.Logging.Colors (getColorsLogger)
 import Blammo.Logging.Logger (HasLogger)
-import Blammo.Logging.ThreadContext (MonadMask, withThreadContext)
+import Blammo.Logging.ThreadContext (MonadMask)
 import Conduit
 import Data.Map.Strict qualified as Map
 import Data.Text.IO qualified as T
@@ -23,13 +23,13 @@ import GHCTL.Change
 import GHCTL.Change.Apply
 import GHCTL.Change.Log
 import GHCTL.Change.Source
+import GHCTL.Config
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Options
 import GHCTL.RepositoryFullName
 import GHCTL.RepositoryYaml
 import GHCTL.RepositoryYaml.Fetch
-import GHCTL.RepositoryYaml.Load
 import GHCTL.SchemaGen
 import Path (SomeBase (..))
 import Path.IO (getCurrentDir)
@@ -63,7 +63,8 @@ run options = do
 
   case options.command of
     Plan poptions -> do
-      changes <- withChanges dir poptions.repositories $ logChange colors
+      config <- loadConfig dir poptions.repositories
+      changes <- withChanges config.repositories $ logChange colors
 
       if null changes
         then logInfo "No differences found"
@@ -73,22 +74,18 @@ run options = do
             $ exitWith
             $ ExitFailure poptions.failOnDiffExitCode
     Apply aoptions -> do
-      void $ withChanges dir aoptions.repositories $ \change -> do
+      config <- loadConfig dir aoptions.repositories
+      void $ withChanges config.repositories $ \change -> do
         logChange colors change
         applyChange aoptions.delete change
     Schema -> liftIO $ T.putStrLn prettySchema
 
 withChanges
-  :: (MonadGitHub m, MonadIO m, MonadLogger m, MonadMask m)
-  => Path Abs Dir
-  -> Maybe (NonEmpty RepositoryFullName)
+  :: MonadGitHub m
+  => Map RepositoryFullName (Maybe RepositoryYaml)
   -> (Change -> m ())
   -> m [Change]
-withChanges dir repositories f = do
-  desired <- withThreadContext ["dir" .= toFilePath dir] $ do
-    logDebug $ "Loading desired state" :# ["dir" .= toFilePath dir]
-    getDesiredRepositoryYamls dir repositories
-
+withChanges desired f = do
   runConduit
     $ yieldMany (Map.toList desired)
     .| awaitForever (uncurry sourceChanges')
