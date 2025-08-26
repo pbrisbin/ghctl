@@ -34,19 +34,28 @@ getDesiredRepositoryYamls
   -> m (Map RepositoryFullName (Maybe RepositoryYaml))
 getDesiredRepositoryYamls dir mNames = do
   let
-    defaultsFile = dir </> [relfile|defaults.yaml|]
+    defaultsFiles =
+      [ dir </> [relfile|defaults.yml|]
+      , dir </> [relfile|defaults.yaml|]
+      ]
     repositoriesDir = dir </> [reldir|repositories|]
 
-  defaultsExist <- doesFileExist defaultsFile
   defaults <-
-    if defaultsExist
-      then decodeYamlOrDie defaultsFile
-      else pure $ Object mempty
+    maybe (pure $ Object mempty) decodeYamlOrDie =<< getFileExists defaultsFiles
 
   (_, yamls) <- listDirRecurRel repositoriesDir
   repositories <- foldMapM (loadRepository defaults repositoriesDir) yamls
 
   pure $ maybe repositories (`filterAndPadNothings` repositories) mNames
+
+getFileExists :: MonadIO m => [Path b File] -> m (Maybe (Path b File))
+getFileExists = \case
+  [] -> pure Nothing
+  (p : ps) -> do
+    exists <- doesFileExist p
+    if exists
+      then pure $ Just p
+      else getFileExists ps
 
 filterAndPadNothings
   :: Ord k
