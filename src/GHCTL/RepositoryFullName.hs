@@ -48,6 +48,12 @@ repositoryFullNameFromText x = case T.splitOn "/" x of
 repositoryFullNameFromFile :: Path Rel File -> Either String RepositoryFullName
 repositoryFullNameFromFile path =
   case splitExtension path of
-    Nothing -> Left "path must have .yaml extension (saw none)"
-    Just (base, ".yaml") -> repositoryFullNameFromText $ pack $ toFilePath base
-    Just (_, ext) -> Left $ "path must have .yaml extension (saw " <> ext <> ")"
+    Nothing -> Left $ extsErr "none"
+    Just (_, ext) | ext `notElem` exts -> Left $ extsErr ext
+    Just (base, _) -> repositoryFullNameFromText $ pack $ toFilePath base
+ where
+  exts :: [String]
+  exts = [".yml", ".yaml"]
+
+  extsErr :: String -> String
+  extsErr x = "path must have valid extension (" <> show exts <> "), saw " <> x
