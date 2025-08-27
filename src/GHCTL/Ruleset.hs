@@ -54,7 +54,7 @@ instance HasCodec RulesetBypassActor where
     object "RulesetBypassActor"
       $ RulesetBypassActor
       <$> (requiredField' "actor_type" .= (.actor_type))
-      <*> (optionalField' "actor_id" .= (.actor_id))
+      <*> (optionalFieldOrNull' "actor_id" .= (.actor_id))
       <*> (requiredField' "bypass_mode" .= (.bypass_mode))
 
 data BypassActorType
@@ -62,6 +62,8 @@ data BypassActorType
   | BypassActorTypeRepositoryAdmin
   | BypassActorTypeRepositoryRole
   | BypassActorTypeIntegration
+  | BypassActorTypeTeam
+  | BypassActorTypeDeployKey
   deriving stock (Bounded, Enum, Eq, Generic, Show)
   deriving (FromJSON, HasCodec, ToJSON) via (TextBoundedEnum BypassActorType)
 
@@ -71,6 +73,8 @@ instance ToText BypassActorType where
     BypassActorTypeRepositoryAdmin -> "RepositoryAdmin"
     BypassActorTypeRepositoryRole -> "RepositoryRole"
     BypassActorTypeIntegration -> "Integration"
+    BypassActorTypeTeam -> "Team"
+    BypassActorTypeDeployKey -> "DeployKey"
 
 data BypassMode
   = BypassModeAlways

@@ -79,7 +79,7 @@ instance HasCodec StatusCheck where
     object "StatusCheck"
       $ StatusCheck
       <$> (requiredField' "context" .= (.context))
-      <*> (optionalField' "app_id" .= (.app_id))
+      <*> (optionalFieldOrNull' "app_id" .= (.app_id))
 
 data PullRequestReviews = PullRequestReviews
   { dismissal_restrictions :: Maybe UsersTeamsApps
