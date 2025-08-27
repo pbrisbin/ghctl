@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-gh repo list \
-  --source \
-  --limit 999 \
-  --json name,isArchived \
-  --jq '.[] | select(.isArchived|not) | .name'
