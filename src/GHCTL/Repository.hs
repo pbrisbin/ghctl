@@ -20,6 +20,8 @@ data Repository = Repository
   , has_issues :: Bool
   , has_projects :: Bool
   , has_wiki :: Bool
+  , archived :: Bool
+  , fork :: Bool
   , default_branch :: Text
   , allow_squash_merge :: Bool
   , allow_merge_commit :: Bool
@@ -40,6 +42,8 @@ instance HasCodec Repository where
       <*> (requiredField' "has_issues" .= (.has_issues))
       <*> (requiredField' "has_projects" .= (.has_projects))
       <*> (requiredField' "has_wiki" .= (.has_wiki))
+      <*> (requiredField' "archived" .= (.archived))
+      <*> (requiredField' "fork" .= (.fork))
       <*> (requiredField' "default_branch" .= (.default_branch))
       <*> (requiredField' "allow_squash_merge" .= (.allow_squash_merge))
       <*> (requiredField' "allow_merge_commit" .= (.allow_merge_commit))
