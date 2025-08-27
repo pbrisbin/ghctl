@@ -41,6 +41,7 @@ library
       GHCTL.GitHub.Client.Error
       GHCTL.GitHub.Token
       GHCTL.Identified
+      GHCTL.Import
       GHCTL.KeyedList
       GHCTL.LogFormatter
       GHCTL.Main
@@ -100,6 +101,8 @@ library
     , path
     , path-io
     , relude
+    , semialign
+    , semigroups
     , text
     , these
     , unliftio

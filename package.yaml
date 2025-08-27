@@ -73,6 +73,8 @@ library:
     - path
     - path-io
     - relude
+    - semialign
+    - semigroups
     - text
     - these
     - unliftio
