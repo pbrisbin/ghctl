@@ -10,13 +10,14 @@ module GHCTL.RepositoryFullName
   ( RepositoryFullName (..)
   , repositoryFullNameFromText
   , repositoryFullNameFromFile
+  , repositoryFullNameToFile
   ) where
 
 import GHCTL.Prelude
 
 import Autodocodec
 import Data.Text qualified as T
-import Path (splitExtension)
+import Path (addExtension, parseRelDir, parseRelFile, splitExtension)
 
 data RepositoryFullName = RepositoryFullName
   { owner :: Text
@@ -57,3 +58,12 @@ repositoryFullNameFromFile path =
 
   extsErr :: String -> String
   extsErr x = "path must have valid extension (" <> show exts <> "), saw " <> x
+
+repositoryFullNameToFile :: RepositoryFullName -> Either String (Path Rel File)
+repositoryFullNameToFile name = first displayException $ do
+  file <-
+    (</>)
+      <$> parseRelDir (unpack name.owner)
+      <*> parseRelFile (unpack name.name)
+
+  addExtension ".yaml" file

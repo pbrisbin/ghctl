@@ -13,6 +13,7 @@ module GHCTL.Options
   , Command (..)
   , PlanOptions (..)
   , ApplyOptions (..)
+  , ImportOptions (..)
   , parseOptions
   ) where
 
@@ -50,6 +51,7 @@ optionsParser =
 data Command
   = Plan PlanOptions
   | Apply ApplyOptions
+  | Import ImportOptions
   | Schema
 
 commandParser :: Parser Command
@@ -64,6 +66,10 @@ commandParser =
           $ withInfo "Apply changes to make current match desired"
           $ Apply
           <$> applyOptionsParser
+      , command "import"
+          $ withInfo "Import repositories"
+          $ Import
+          <$> importOptionsParser
       , command "schema" $ withInfo "Dump configuration schema" $ pure Schema
       ]
 
@@ -103,6 +109,36 @@ applyOptionsParser :: Parser ApplyOptions
 applyOptionsParser =
   ApplyOptions
     <$> deleteOption
+    <*> (nonEmpty <$> many repositoryOption)
+
+-- |
+--
+-- TODO topic
+-- TODO visibility
+data ImportOptions = ImportOptions
+  { noArchived :: Bool
+  , source :: Bool
+  , repositories :: Maybe (NonEmpty RepositoryFullName)
+  }
+
+-- |
+--
+-- NB. options are meant to mirror @gh repo list@.
+importOptionsParser :: Parser ImportOptions
+importOptionsParser =
+  ImportOptions
+    <$> switch
+      ( mconcat
+          [ long "no-archived"
+          , help "Omit archived repositories"
+          ]
+      )
+    <*> switch
+      ( mconcat
+          [ long "source"
+          , help "Import only non-forks"
+          ]
+      )
     <*> (nonEmpty <$> many repositoryOption)
 
 repositoryOption :: Parser RepositoryFullName

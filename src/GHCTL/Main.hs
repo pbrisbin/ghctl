@@ -26,6 +26,7 @@ import GHCTL.Change.Source
 import GHCTL.Config
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
+import GHCTL.Import
 import GHCTL.Options
 import GHCTL.RepositoryFullName
 import GHCTL.RepositoryYaml
@@ -78,6 +79,9 @@ run options = do
       void $ withChanges config.repositories $ \change -> do
         logChange colors change
         applyChange aoptions.delete change
+    Import ioptions -> do
+      config <- loadConfig dir ioptions.repositories
+      importRepositories ioptions config
     Schema -> liftIO $ T.putStrLn prettySchema
 
 withChanges
