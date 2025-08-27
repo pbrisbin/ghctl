@@ -29,6 +29,8 @@ class Monad m => MonadGitHub m where
 
   getRepository :: Text -> Text -> m (Maybe Repository)
 
+  listUserRepositories :: Text -> m [Identified]
+
   updateRepository :: Text -> Text -> Repository -> m ()
 
   deleteRepository :: Text -> Text -> m ()
