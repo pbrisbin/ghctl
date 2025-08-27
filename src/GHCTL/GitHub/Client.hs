@@ -9,6 +9,7 @@
 module GHCTL.GitHub.Client
   ( getGitHub
   , getGitHubMaybe
+  , getGitHubPaginated
   , postGitHub
   , putGitHub
   , deleteGitHub
@@ -22,6 +23,7 @@ import GHCTL.Prelude
 
 import Data.Aeson qualified as Aeson
 import Data.ByteString.Lazy qualified as BSL
+import Data.Text qualified as T
 import GHCTL.GitHub.Client.Error
 import GHCTL.GitHub.Token
 import Network.HTTP.Client qualified as HTTP
@@ -90,6 +92,34 @@ getGitHubMaybe path =
       , onSuccess = fmap Just . Aeson.eitherDecode
       , onNotFound = Just Nothing
       }
+
+getGitHubPaginated
+  :: ( FromJSON a
+     , HasGitHubToken env
+     , MonadIO m
+     , MonadLogger m
+     , MonadReader env m
+     )
+  => Int
+  -- ^ Per page
+  -> Text
+  -> m [a]
+getGitHubPaginated per path = go [] (1 :: Int)
+ where
+  go acc page = do
+    xs <-
+      getGitHub
+        $ path
+        <> (if '?' `T.elem` path then "&" else "?")
+        <> "page="
+        <> show page
+        <> "&per_page="
+        <> show per
+
+    -- naively paginate until we get a page with fewer than `per` results
+    if length xs < per
+      then pure $ acc <> xs
+      else go (acc <> xs) (page + 1)
 
 postGitHub
   :: ( HasGitHubToken env

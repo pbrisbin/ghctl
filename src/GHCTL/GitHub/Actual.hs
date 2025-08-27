@@ -59,6 +59,13 @@ instance
   getRepository owner name =
     getGitHubMaybe $ "/repos/" <> owner <> "/" <> name
 
+  listUserRepositories username =
+    getGitHubPaginated 100
+      $ "/users/"
+      <> username
+      <> "/repos"
+      <> "?sort=updated&direction=desc"
+
   updateRepository owner name = postGitHub $ "/repos/" <> owner <> "/" <> name
 
   deleteRepository owner name = deleteGitHub $ "/repos/" <> owner <> "/" <> name
