@@ -15,6 +15,16 @@ module GHCTL.Options
   , ApplyOptions (..)
   , ImportOptions (..)
   , parseOptions
+
+    -- * Parsers for Ronn generation
+  , optionsParser
+  , optionsInfo
+  , planOptionsParser
+  , planCmdInfo
+  , applyOptionsParser
+  , applyCmdInfo
+  , importOptionsParser
+  , importCmdInfo
   ) where
 
 import GHCTL.Prelude
@@ -30,7 +40,7 @@ data Options = Options
   }
 
 parseOptions :: IO Options
-parseOptions = execParser $ withInfo "Maintain GitHub settings" optionsParser
+parseOptions = execParser $ withInfo optionsInfo optionsParser
 
 optionsParser :: Parser Options
 optionsParser =
@@ -48,29 +58,25 @@ optionsParser =
       )
     <*> commandParser
 
+optionsInfo :: IsString a => a
+optionsInfo = "Maintain GitHub settings"
+
 data Command
   = Plan PlanOptions
   | Apply ApplyOptions
   | Import ImportOptions
   | Schema
+  | Docs
 
 commandParser :: Parser Command
 commandParser =
   subparser
     $ mconcat
-      [ command "plan"
-          $ withInfo "Show differences between desired and current"
-          $ Plan
-          <$> planOptionsParser
-      , command "apply"
-          $ withInfo "Apply changes to make current match desired"
-          $ Apply
-          <$> applyOptionsParser
-      , command "import"
-          $ withInfo "Import repositories"
-          $ Import
-          <$> importOptionsParser
+      [ command "plan" $ withInfo planCmdInfo $ Plan <$> planOptionsParser
+      , command "apply" $ withInfo applyCmdInfo $ Apply <$> applyOptionsParser
+      , command "import" $ withInfo importCmdInfo $ Import <$> importOptionsParser
       , command "schema" $ withInfo "Dump configuration schema" $ pure Schema
+      , command "docs" $ withInfo "Produce man-pages in docs/" $ pure Docs
       ]
 
 data PlanOptions = PlanOptions
@@ -100,6 +106,9 @@ planOptionsParser =
       )
     <*> (nonEmpty <$> many repositoryOption)
 
+planCmdInfo :: IsString a => a
+planCmdInfo = "Show differences between desired and current"
+
 data ApplyOptions = ApplyOptions
   { delete :: Delete
   , repositories :: Maybe (NonEmpty RepositoryFullName)
@@ -111,6 +120,9 @@ applyOptionsParser =
     <$> deleteOption
     <*> (nonEmpty <$> many repositoryOption)
 
+applyCmdInfo :: IsString a => a
+applyCmdInfo = "Apply changes to make current match desired"
+
 -- |
 --
 -- TODO topic
@@ -120,6 +132,9 @@ data ImportOptions = ImportOptions
   , source :: Bool
   , repositories :: Maybe (NonEmpty RepositoryFullName)
   }
+
+importCmdInfo :: IsString a => a
+importCmdInfo = "Import repositories"
 
 -- |
 --

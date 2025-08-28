@@ -73,6 +73,8 @@ library:
     - path
     - path-io
     - relude
+    - ronn
+    - ronn-optparse-applicative
     - semialign
     - semigroups
     - text
