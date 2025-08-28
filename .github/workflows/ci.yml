@@ -114,6 +114,9 @@ jobs:
           cp -v docs/*.html _site/
           cp -v _site/ghctl.5.html _site/index.html
 
+      - name: Add repositories schema
+        run: ghctl schema > _site/repository.schema.json
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
