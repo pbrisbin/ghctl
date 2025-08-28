@@ -118,6 +118,8 @@ jobs:
 
       - name: Add repositories schema
         run: ghctl schema > _site/repository.schema.json
+        env:
+          GITHUB_TOKEN: unused
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
