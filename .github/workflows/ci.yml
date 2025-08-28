@@ -114,7 +114,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -v docs/*.html _site/
-          cp -v _site/ghctl.5.html _site/index.html
+          cp -v _site/ghctl.1.html _site/index.html
 
       - name: Add repositories schema
         run: ghctl schema > _site/repository.schema.json
