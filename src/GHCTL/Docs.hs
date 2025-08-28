@@ -33,7 +33,19 @@ import Ronn.Options.Applicative ()
 
 updateDocs :: IO ()
 updateDocs = do
-  -- writeRonn $ ghctlRonn "ghctl" optionsInfo optionsParser
+  writeRonn
+    $ ghctlRonn
+      "ghctl"
+      optionsInfo
+      optionsParser
+      [ seeAlsoSection
+          [ ManRef "ghctl" ManSection5
+          , ManRef "ghctl-plan" ManSection1
+          , ManRef "ghctl-apply" ManSection1
+          , ManRef "ghctl-import" ManSection1
+          ]
+      ]
+
   writeRonn
     $ ghctlRonn
       "ghctl-plan"
