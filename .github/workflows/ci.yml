@@ -64,3 +64,59 @@ jobs:
       - uses: haskell-actions/hlint-run@v2
         with:
           fail-on: warning
+
+  pages:
+    #TODO if: main
+    needs: test
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+
+      - name: Install ghctl
+        run: |
+          chmod +x ghctl
+          sudo mv -v ghctl /usr/local/bin
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs
+
+      - name: Generate Ronn man-pages to docs/
+        run: ghctl docs
+        env:
+          GITHUB_TOKEN: unused
+
+      - name: Setup ronn-ng
+        run: |
+          gem install --user ronn-ng
+          for bin in "$HOME"/.local/share/gem/ruby/*/bin; do
+            echo "$bin"
+          done >>"$GITHUB_PATH"
+
+      - name: Generate HTML man-pages in docs/
+        run: ronn --style toc --html docs/*.ronn
+
+      - name: Copy HTML sources to _site
+        run: |
+          mkdir -p _site
+          cp -v docs/*.html _site/
+          cp -v _site/ghctl.5.html _site/index.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
