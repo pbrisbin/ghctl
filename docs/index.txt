@@ -1,0 +1,6 @@
+# manuals included in this project:
+ghctl(1) ghctl.1.ronn
+ghctl(5) ghctl.5.ronn
+ghctl-apply(1) ghctl-apply.1.ronn
+ghctl-import(1) ghctl-import.1.ronn
+ghctl-plan(1) ghctl-plan.1.ronn
