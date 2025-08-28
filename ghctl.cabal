@@ -35,6 +35,7 @@ library
       GHCTL.Config
       GHCTL.CRUD
       GHCTL.Diff
+      GHCTL.Docs
       GHCTL.GitHub
       GHCTL.GitHub.Actual
       GHCTL.GitHub.Client
@@ -101,6 +102,8 @@ library
     , path
     , path-io
     , relude
+    , ronn
+    , ronn-optparse-applicative
     , semialign
     , semigroups
     , text

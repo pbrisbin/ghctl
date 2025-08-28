@@ -24,6 +24,7 @@ import GHCTL.Change.Apply
 import GHCTL.Change.Log
 import GHCTL.Change.Source
 import GHCTL.Config
+import GHCTL.Docs
 import GHCTL.GitHub (MonadGitHub)
 import GHCTL.GitHub.Client.Error (logGitHubClientError)
 import GHCTL.Import
@@ -83,6 +84,7 @@ run options = do
       config <- loadConfig dir ioptions.repositories
       importRepositories ioptions config
     Schema -> liftIO $ T.putStrLn prettySchema
+    Docs -> liftIO updateDocs
 
 withChanges
   :: MonadGitHub m
