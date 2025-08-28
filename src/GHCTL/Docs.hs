@@ -112,9 +112,9 @@ updateDocs = do
           , Ronn.Section
               { Ronn.name = "SCHEMA"
               , Ronn.content =
-                  [ paragraph
-                      [ "The repository schema can be found [here][schema]. However, this schema is only"
-                      , "asserted"
+                  [ paragraph ["https://pbrisbin.github.io/ghctl/repository.schema.json"]
+                  , paragraph
+                      [ "The repository schema is schema is only asserted"
                       , Ronn.Strong "after defaults are applied" <> "."
                       , "Therefore, any given repository file itself need not be"
                       , "valid schema. For example, managing a repository that"
@@ -123,8 +123,6 @@ updateDocs = do
                       , Ronn.Code "{}"
                       , "as its contents."
                       ]
-                  , paragraph
-                      ["[schema]: ./repository.schema.json"]
                   , paragraph
                       [ "Our schema follows GitHub's API exactly, so feel free to go by that"
                       , "documentation as well. There is a minor difference when"
