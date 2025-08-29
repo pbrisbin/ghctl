@@ -159,7 +159,7 @@ updateDocs = do
                       , "    # {more properties}"
                       ]
                   , paragraph
-                      [ "This makes it possible to supply defaults within the sub-object at the key"
+                      [ "This makes it possible to override within the sub-object at the key"
                       , Ronn.Code "main" <> "."
                       , "Otherwise, wanting to change any attribute of any rule"
                       , "would require respecifying the entire"
@@ -168,7 +168,7 @@ updateDocs = do
                       ]
                   , paragraph
                       [ "We support this decoding anywhere there is a clear"
-                      , "uniquely-identifying property, such as"
+                      , "discriminating property, such as"
                       , Ronn.Code "name" <> ","
                       , Ronn.Code "type" <> ","
                       , "or"
