@@ -36,10 +36,19 @@ instance HasCodec Ruleset where
       $ Ruleset
       <$> (requiredField' "name" .= (.name))
       <*> (requiredField' "target" .= (.target))
-      <*> (requiredField' "enforcement" .= (.enforcement))
-      <*> (requiredField' "bypass_actors" .= (.bypass_actors))
+      <*> ( optionalFieldWithDefault' "enforcement" RulesetEnforcementDisabled
+              .= (.enforcement)
+          )
+      <*> (optionalFieldWithDefault' "bypass_actors" [] .= (.bypass_actors))
       <*> (optionalField' "conditions" .= (.conditions))
-      <*> (requiredField' "rules" .= (.rules))
+      <*> (optionalFieldWithDefault' "rules" defaultRules .= (.rules))
+
+defaultRules :: KeyedList "type" RulesetRule
+defaultRules =
+  KeyedList
+    [ RulesetRule_deletion
+    , RulesetRule_non_fast_forward
+    ]
 
 data RulesetBypassActor = RulesetBypassActor
   { actor_type :: BypassActorType
@@ -55,7 +64,7 @@ instance HasCodec RulesetBypassActor where
       $ RulesetBypassActor
       <$> (requiredField' "actor_type" .= (.actor_type))
       <*> (optionalFieldOrNull' "actor_id" .= (.actor_id))
-      <*> (requiredField' "bypass_mode" .= (.bypass_mode))
+      <*> (optionalFieldWithDefault' "bypass_mode" BypassModeAlways .= (.bypass_mode))
 
 data BypassActorType
   = BypassActorTypeOrganizationAdmin
@@ -314,16 +323,22 @@ instance HasCodec RulesetRulePullRequestParameters where
   codec =
     object "RulesetRulePullRequestParameters"
       $ RulesetRulePullRequestParameters
-      <$> (requiredField' "allowed_merge_methods" .= (.allowed_merge_methods))
-      <*> ( requiredField' "dismiss_stale_reviews_on_push"
+      <$> ( optionalFieldWithDefault' "allowed_merge_methods" [minBound .. maxBound]
+              .= (.allowed_merge_methods)
+          )
+      <*> ( optionalFieldWithDefault' "dismiss_stale_reviews_on_push" False
               .= (.dismiss_stale_reviews_on_push)
           )
-      <*> (requiredField' "require_code_owner_review" .= (.require_code_owner_review))
-      <*> (requiredField' "require_last_push_approval" .= (.require_last_push_approval))
-      <*> ( requiredField' "required_approving_review_count"
+      <*> ( optionalFieldWithDefault' "require_code_owner_review" False
+              .= (.require_code_owner_review)
+          )
+      <*> ( optionalFieldWithDefault' "require_last_push_approval" False
+              .= (.require_last_push_approval)
+          )
+      <*> ( optionalFieldWithDefault' "required_approving_review_count" 0
               .= (.required_approving_review_count)
           )
-      <*> ( requiredField' "required_review_thread_resolution"
+      <*> ( optionalFieldWithDefault' "required_review_thread_resolution" False
               .= (.required_review_thread_resolution)
           )
 
@@ -354,7 +369,7 @@ instance HasCodec RulesetRuleRequiredStatusChecksParameters where
     object "RulesetRuleRequiredStatusChecksParameters"
       $ RulesetRuleRequiredStatusChecksParameters
       <$> (requiredField' "required_status_checks" .= (.required_status_checks))
-      <*> ( requiredField' "strict_required_status_checks_policy"
+      <*> ( optionalFieldWithDefault' "strict_required_status_checks_policy" False
               .= (.strict_required_status_checks_policy)
           )
 
