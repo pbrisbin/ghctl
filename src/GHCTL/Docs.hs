@@ -84,8 +84,8 @@ updateDocs = do
       , description = [".ghctl directory"]
       , sections =
           [ Ronn.Section
-              { Ronn.name = "DESCRIPTION"
-              , Ronn.content =
+              { name = "DESCRIPTION"
+              , content =
                   [ paragraph
                       [ Ronn.Strong "ghctl"
                       , "operates on a directory structure to determine the"
@@ -95,8 +95,8 @@ updateDocs = do
                   ]
               }
           , Ronn.Section
-              { Ronn.name = "REPOSITORIES"
-              , Ronn.content =
+              { name = "REPOSITORIES"
+              , content =
                   [ paragraph
                       [ "The"
                       , Ronn.Code "repositories"
@@ -109,8 +109,8 @@ updateDocs = do
                   ]
               }
           , Ronn.Section
-              { Ronn.name = "DEFAULTS"
-              , Ronn.content =
+              { name = "DEFAULTS"
+              , content =
                   [ paragraph
                       [ "If present, the"
                       , Ronn.Code "defaults.yaml"
@@ -122,8 +122,8 @@ updateDocs = do
                   ]
               }
           , Ronn.Section
-              { Ronn.name = "SCHEMA"
-              , Ronn.content =
+              { name = "SCHEMA"
+              , content =
                   [ paragraph ["https://pbrisbin.github.io/ghctl/repository.schema.json"]
                   , paragraph
                       [ "The repository schema is schema is only asserted"
@@ -137,11 +137,16 @@ updateDocs = do
                       ]
                   , paragraph
                       [ "Our schema follows GitHub's API exactly, so feel free to go by that"
-                      , "documentation as well. There is a minor difference when"
-                      , "it comes to \"keyed\" lists"
+                      , "documentation as well. There are a few minor differences"
+                      , "as described below."
                       ]
-                  , paragraph
-                      ["For example,", Ronn.Code "rulesets", "might look like:"]
+                  ]
+              }
+          , Ronn.Section
+              { name = "KEYED OBJECT LISTS"
+              , content =
+                  [ paragraph
+                      ["Consider the normal schame for ", Ronn.Code "rulesets" <> ":"]
                   , codeblock
                       "yaml"
                       [ "rulesets:"
