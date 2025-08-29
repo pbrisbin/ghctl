@@ -1,3 +1,5 @@
+.highlight { margin-left: 8ex; } /* align with normal paragraph margins */
+
 /* https://raw.githubusercontent.com/jwarby/jekyll-pygments-themes/refs/heads/master/autumn.css */
 .highlight .hll { background-color: #ffffcc }
 .highlight .c { color: #aaaaaa; font-style: italic } /* Comment */
