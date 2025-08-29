@@ -1,3 +1,4 @@
 .stack-work
 docs/*
+!docs/*.css
 !docs/index.txt

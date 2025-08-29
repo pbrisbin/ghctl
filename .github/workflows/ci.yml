@@ -108,7 +108,9 @@ jobs:
           done >>"$GITHUB_PATH"
 
       - name: Generate HTML man-pages in docs/
-        run: ronn --style toc --html docs/*.ronn
+        run: ronn --style toc,code --html docs/*.ronn
+        env:
+          RONN_STYLE: docs
 
       - name: Copy HTML sources to _site
         run: |
