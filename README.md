@@ -1,5 +1,8 @@
 # ghctl
 
+> [!WARNING]
+> This project was migrated to https://codeberg.org/pbrisbin/fjctl.
+
 CLI for maintaining GitHub settings as [IaC][].
 
 [iac]: https://en.wikipedia.org/wiki/Infrastructure_as_code
